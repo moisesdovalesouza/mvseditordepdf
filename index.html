@@ -5,22 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>MVS Editor de PDF</title>
   <meta name="description" content="Editor de PDF jurídico por etapas, com digitalização, capa, timbre, OCR e exportação." />
-  <meta name="theme-color" content="#fbf7ec" />
+  <meta name="theme-color" content="#17172d" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="./icons/favicon.ico" sizes="any" />
-  <link rel="icon" href="./icons/icon-32.png" type="image/png" />
   <link rel="icon" href="./icons/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="./icons/favicon.svg" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="MVS PDF" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
   <div class="shell">
     <header class="app-header">
       <div class="brand">
-        <img src="./icons/icon-192.png" alt="MVS Editor de PDF" class="brand-logo app-icon-logo" />
+        <img src="./icons/favicon.svg" alt="MVS Editor de PDF" class="brand-logo app-icon-logo" />
         <div>
           <p class="eyebrow">Editor jurídico instalável</p>
           <h1>MVS Editor de PDF</h1>
@@ -60,7 +58,7 @@
 
             <details class="font-details">
               <summary>Fontes do PDF e da capa</summary>
-              <p class="hint">A interface já usa Montserrat e Libre Baskerville quando disponíveis no sistema ou via web. Para embutir a fonte no PDF com fidelidade absoluta, ainda é possível enviar .ttf ou .otf.</p>
+              <p class="hint">A interface usa Montserrat, Libre Baskerville, Inter e Source Serif quando disponíveis. O carregamento manual de .ttf ou .otf fica preservado para fidelidade no PDF.</p>
               <label>Fonte principal
                 <select id="fontPresetSelect" class="font-preview-select">
                   <option value="montserrat" style="font-family: Montserrat, Arial, sans-serif;">Montserrat</option>
@@ -236,17 +234,10 @@
               <summary>Papel e área útil</summary>
               <div class="two-col">
                 <label>Papel
-                  <select id="paperSize">
-                    <option value="a4" selected>A4</option>
-                    <option value="letter">Carta</option>
-                    <option value="legal">Ofício/Legal</option>
-                  </select>
+                  <select id="paperSize"><option value="a4" selected>A4</option><option value="letter">Carta</option><option value="legal">Ofício/Legal</option></select>
                 </label>
                 <label>Orientação
-                  <select id="orientation">
-                    <option value="portrait" selected>Retrato</option>
-                    <option value="landscape">Paisagem</option>
-                  </select>
+                  <select id="orientation"><option value="portrait" selected>Retrato</option><option value="landscape">Paisagem</option></select>
                 </label>
               </div>
               <label>Margem do conteúdo: <span id="paperMarginValue">10</span> mm
@@ -258,18 +249,10 @@
               <summary>Bordas e perspectiva</summary>
               <label class="checkline"><input id="perspectiveEnabled" type="checkbox" checked /> Corrigir perspectiva</label>
               <div class="two-col">
-                <label>Topo <span id="edgeTopValue">0</span>%
-                  <input id="edgeTop" type="range" min="0" max="40" value="0" />
-                </label>
-                <label>Direita <span id="edgeRightValue">0</span>%
-                  <input id="edgeRight" type="range" min="0" max="40" value="0" />
-                </label>
-                <label>Base <span id="edgeBottomValue">0</span>%
-                  <input id="edgeBottom" type="range" min="0" max="40" value="0" />
-                </label>
-                <label>Esquerda <span id="edgeLeftValue">0</span>%
-                  <input id="edgeLeft" type="range" min="0" max="40" value="0" />
-                </label>
+                <label>Topo <span id="edgeTopValue">0</span>%<input id="edgeTop" type="range" min="0" max="40" value="0" /></label>
+                <label>Direita <span id="edgeRightValue">0</span>%<input id="edgeRight" type="range" min="0" max="40" value="0" /></label>
+                <label>Base <span id="edgeBottomValue">0</span>%<input id="edgeBottom" type="range" min="0" max="40" value="0" /></label>
+                <label>Esquerda <span id="edgeLeftValue">0</span>%<input id="edgeLeft" type="range" min="0" max="40" value="0" /></label>
               </div>
             </details>
 
@@ -280,21 +263,11 @@
                 <button id="cleanPresetBtn" class="small">Colorido limpo</button>
                 <button id="resetFilterBtn" class="small">Original</button>
               </div>
-              <label>Brilho <span id="brightnessValue">100</span>%
-                <input id="brightness" type="range" min="50" max="180" value="100" />
-              </label>
-              <label>Contraste <span id="contrastValue">100</span>%
-                <input id="contrast" type="range" min="50" max="220" value="100" />
-              </label>
-              <label>Saturação <span id="saturationValue">100</span>%
-                <input id="saturation" type="range" min="0" max="180" value="100" />
-              </label>
-              <label>Escala de cinza <span id="grayscaleValue">0</span>%
-                <input id="grayscale" type="range" min="0" max="100" value="0" />
-              </label>
-              <label>Preto/branco <span id="thresholdValue">0</span>
-                <input id="threshold" type="range" min="0" max="255" value="0" />
-              </label>
+              <label>Brilho <span id="brightnessValue">100</span>%<input id="brightness" type="range" min="50" max="180" value="100" /></label>
+              <label>Contraste <span id="contrastValue">100</span>%<input id="contrast" type="range" min="50" max="220" value="100" /></label>
+              <label>Saturação <span id="saturationValue">100</span>%<input id="saturation" type="range" min="0" max="180" value="100" /></label>
+              <label>Escala de cinza <span id="grayscaleValue">0</span>%<input id="grayscale" type="range" min="0" max="100" value="0" /></label>
+              <label>Preto/branco <span id="thresholdValue">0</span><input id="threshold" type="range" min="0" max="255" value="0" /></label>
             </details>
 
             <details>
@@ -304,70 +277,45 @@
               <label class="checkline"><input id="includeFooterInfo" type="checkbox" checked /> Rodapé com classificação</label>
               <label class="checkline"><input id="embedOcrText" type="checkbox" checked /> PDF pesquisável quando houver OCR</label>
               <label>Idioma OCR
-                <select id="ocrLang">
-                  <option value="por" selected>Português</option>
-                  <option value="eng">Inglês</option>
-                  <option value="por+eng">Português + Inglês</option>
-                </select>
+                <select id="ocrLang"><option value="por" selected>Português</option><option value="eng">Inglês</option><option value="por+eng">Português + Inglês</option></select>
               </label>
               <div class="button-grid">
-                <button id="ocrPageBtn" class="small">OCR página</button>
-                <button id="ocrAttachmentBtn" class="small">OCR anexo</button>
-                <button id="ocrAllBtn" class="small">OCR tudo</button>
+                <button id="ocrPageBtn" class="small">OCR página</button><button id="ocrAttachmentBtn" class="small">OCR anexo</button><button id="ocrAllBtn" class="small">OCR tudo</button>
               </div>
             </details>
-<div class="apply-panel">
+            <div class="apply-panel">
               <strong>Aplicar padrão atual</strong>
               <p>Depois de ajustar uma página, aplique ao anexo, ao Doc ou a todos.</p>
               <div class="button-grid">
-                <button id="applyToAttachmentBtn" class="small">Ao anexo</button>
-                <button id="applyToDocBtn" class="small">Ao Doc</button>
-                <button id="applyToAllBtn" class="small">A todos</button>
+                <button id="applyToAttachmentBtn" class="small">Ao anexo</button><button id="applyToDocBtn" class="small">Ao Doc</button><button id="applyToAllBtn" class="small">A todos</button>
               </div>
             </div>
-
           </aside>
         </div>
 
-        <div class="footer-nav">
-          <button class="ghost prev" data-prev="1">Voltar</button>
-          <button class="primary next" data-next="3">Avançar</button>
-        </div>
+        <div class="footer-nav"><button class="ghost prev" data-prev="1">Voltar</button><button class="primary next" data-next="3">Avançar</button></div>
       </section>
 
       <section id="step3" class="step-panel">
         <div class="grid export-grid">
           <aside class="card">
-            <div class="card-title">
-              <h2>Prévia por Doc</h2>
-              <p>Confira Docs e miniaturas antes de gerar.</p>
-            </div>
+            <div class="card-title"><h2>Prévia por Doc</h2><p>Confira Docs e miniaturas antes de gerar.</p></div>
             <div id="exportDocList" class="doc-tabs"></div>
             <div id="exportThumbs" class="export-thumbs"></div>
-
             <hr />
-
             <label>Saída
-              <select id="exportMode">
-                <option value="single" selected>PDF único</option>
-                <option value="zip">ZIP com um PDF por Doc</option>
-              </select>
+              <select id="exportMode"><option value="single" selected>PDF único</option><option value="zip">ZIP com um PDF por Doc</option></select>
             </label>
-
             <label>Nome do arquivo geral, opcional
               <input id="outputName" type="text" placeholder="Se vazio, usa Doc e título quando for individual" />
             </label>
-
             <input id="previewPdfBtn" type="hidden" />
             <p class="hint">A pré-visualização é gerada automaticamente ao entrar nesta etapa. O card fica só para organizar e conferir os Docs.</p>
           </aside>
 
           <section class="card preview-export">
             <div class="card-title horizontal">
-              <div>
-                <h2>Pré-visualização final</h2>
-                <p>Somente conferência. Para editar, volte para a etapa 2.</p>
-              </div>
+              <div><h2>Pré-visualização final</h2><p>Somente conferência. Para editar, volte para a etapa 2.</p></div>
               <button id="downloadPreviewBtn" class="ghost" disabled>Baixar arquivo gerado</button>
             </div>
             <iframe id="pdfFrame" title="Pré-visualização do PDF"></iframe>
@@ -377,27 +325,16 @@
 
         <div class="footer-nav">
           <button class="ghost prev" data-prev="2">Voltar</button>
-          <div class="bottom-actions">
-            <button id="downloadPdfBtn" class="primary">Baixar documentos</button>
-            <button id="newProjectBtn" class="ghost danger">Novo projeto</button>
-          </div>
+          <div class="bottom-actions"><button id="downloadPdfBtn" class="primary">Baixar documentos</button><button id="newProjectBtn" class="ghost danger">Novo projeto</button></div>
         </div>
       </section>
     </main>
 
-
     <div id="confirmModal" class="modal-backdrop" hidden aria-hidden="true">
       <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
         <div class="confirm-icon">!</div>
-        <div>
-          <p class="eyebrow">Confirmar novo projeto</p>
-          <h2 id="confirmTitle">Apagar tudo e iniciar novamente?</h2>
-          <p>Todos os Docs, anexos, páginas, ajustes, OCR e pré-visualização atual serão removidos. A operação não pode ser desfeita.</p>
-        </div>
-        <div class="confirm-actions">
-          <button id="cancelNewProjectBtn" class="ghost" type="button">Cancelar</button>
-          <button id="confirmNewProjectBtn" class="primary danger-fill" type="button">Apagar e voltar à etapa 1</button>
-        </div>
+        <div><p class="eyebrow">Confirmar novo projeto</p><h2 id="confirmTitle">Apagar tudo e iniciar novamente?</h2><p>Todos os Docs, anexos, páginas, ajustes, OCR e pré-visualização atual serão removidos. A operação não pode ser desfeita.</p></div>
+        <div class="confirm-actions"><button id="cancelNewProjectBtn" class="ghost" type="button">Cancelar</button><button id="confirmNewProjectBtn" class="primary danger-fill" type="button">Apagar e voltar à etapa 1</button></div>
       </div>
     </div>
 
