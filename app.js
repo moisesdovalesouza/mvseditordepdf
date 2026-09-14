@@ -162,23 +162,83 @@ function render(opts = {}){
 function renderDocTabs(){
   els.docTabs.innerHTML = "";
   state.docs.forEach(doc=>{
-    const b = document.createElement("div");
-    b.className = "doc-tab" + (doc.id===state.activeDocId ? " active" : "");
-    b.draggable = true;
-    b.dataset.docId = doc.id;
-    const titleLine = [doc.number || "Doc sem número", doc.title || doc.classification || ""].filter(Boolean).join(" - ");
-    b.innerHTML = `
-      <button class="doc-tab-main" type="button">
-        <strong>${esc(titleLine)}</strong>
-        <small>${doc.attachments.length} anexo(s). Arraste para organizar.</small>
-      </button>
-      <button class="small ghost danger doc-remove" type="button" title="Excluir este Doc">Excluir</button>
+    const details = document.createElement("details");
+    details.className = "doc-tab doc-index-card" + (doc.id===state.activeDocId ? " active" : "");
+    details.open = doc.id===state.activeDocId;
+    details.draggable = true;
+    details.dataset.docId = doc.id;
+    const titleLine = [doc.number || "Doc sem número", doc.title || doc.classification || "Sem classificação"].filter(Boolean).join(" - ");
+    details.innerHTML = `
+      <summary class="doc-index-summary">
+        <span class="doc-grip" title="Arraste para organizar">⋮⋮</span>
+        <span class="doc-summary-text">
+          <strong>${esc(titleLine)}</strong>
+          <small>${doc.attachments.length} anexo(s). Clique para abrir o índice deste Doc.</small>
+        </span>
+        <button class="small ghost danger doc-remove" type="button" title="Excluir este Doc">Excluir</button>
+      </summary>
+      <div class="doc-index-body">
+        <div class="doc-inline-fields">
+          <label>Número do Doc
+            <input class="doc-number-inline" type="text" value="${esc(doc.number || "")}" placeholder="Ex.: Doc. 01" />
+          </label>
+          <label>Título do Doc
+            <input class="doc-title-inline" type="text" value="${esc(doc.title || "")}" placeholder="Ex.: Documentos de instrução" />
+          </label>
+          <label>Classificação
+            <select class="doc-class-inline">${DOC_TYPES.map(t=>`<option value="${esc(t)}" ${t===doc.classification?"selected":""}>${esc(t || "Sem classificação")}</option>`).join("")}</select>
+          </label>
+        </div>
+        <div class="doc-index-attachments">
+          <div class="doc-index-attachments-title">
+            <strong>Anexos deste Doc</strong>
+            <small>Também editáveis aqui, sem trocar de painel.</small>
+          </div>
+          <div class="doc-index-attachment-list">
+            ${doc.attachments.length ? doc.attachments.map(att=>`
+              <div class="doc-index-attachment" data-attachment-id="${att.id}">
+                <button type="button" class="ghost select-index-attachment">
+                  <strong>${esc(att.title || att.classification || "Anexo sem título")}</strong>
+                  <small>${att.pages.length} face(s)${att.layoutFaces>1 ? ` · ${att.layoutFaces} por A4` : ""}</small>
+                </button>
+                <label>Título
+                  <input class="idx-att-title" type="text" value="${esc(att.title || "")}" placeholder="Título do anexo" />
+                </label>
+                <label>Classificação
+                  <select class="idx-att-class">${DOC_TYPES.map(t=>`<option value="${esc(t)}" ${t===att.classification?"selected":""}>${esc(t || "Sem classificação")}</option>`).join("")}</select>
+                </label>
+                <label class="checkline compact"><input class="idx-att-cover" type="checkbox" ${att.showInCover?"checked":""} /> Mostrar na capa</label>
+                <button class="small ghost danger idx-att-remove" type="button">Excluir anexo</button>
+              </div>
+            `).join("") : `<p class="hint">Nenhum anexo neste Doc ainda.</p>`}
+          </div>
+        </div>
+      </div>
     `;
-    b.querySelector(".doc-tab-main").onclick = () => selectDoc(doc.id);
-    b.querySelector(".doc-remove").onclick = (e) => { e.stopPropagation(); removeDoc(doc.id); };
-    b.onclick = e => { if (!e.target.closest("button")) selectDoc(doc.id); };
-    bindDragSort(b, "doc");
-    els.docTabs.appendChild(b);
+    details.querySelector(".doc-remove").onclick = (e) => { e.preventDefault(); e.stopPropagation(); removeDoc(doc.id); };
+    details.querySelector(".doc-index-summary").addEventListener("click", (e)=>{
+      if(e.target.closest("button")) return;
+      selectDoc(doc.id);
+    });
+    const numberInput=details.querySelector(".doc-number-inline");
+    const titleInput=details.querySelector(".doc-title-inline");
+    const classSelect=details.querySelector(".doc-class-inline");
+    numberInput.oninput=()=>{doc.number=numberInput.value; renderEditSelectors(); renderExportDocs();};
+    titleInput.oninput=()=>{doc.title=titleInput.value; renderEditSelectors(); renderExportDocs();};
+    classSelect.onchange=()=>{doc.classification=classSelect.value; renderEditSelectors(); renderExportDocs();};
+
+    details.querySelectorAll(".doc-index-attachment").forEach(row=>{
+      const att=doc.attachments.find(a=>a.id===row.dataset.attachmentId);
+      if(!att) return;
+      row.querySelector(".select-index-attachment").onclick=()=>{state.activeDocId=doc.id; selectAttachment(att.id);};
+      const ti=row.querySelector(".idx-att-title"), cl=row.querySelector(".idx-att-class"), cv=row.querySelector(".idx-att-cover");
+      ti.oninput=()=>{att.title=ti.value; renderAttachmentThumbStrip(); renderExportThumbs();};
+      cl.onchange=()=>{att.classification=cl.value; renderAttachmentThumbStrip(); renderExportThumbs();};
+      cv.onchange=()=>{att.showInCover=cv.checked;};
+      row.querySelector(".idx-att-remove").onclick=()=>{state.activeDocId=doc.id; removeAttachment(att.id);};
+    });
+    bindDragSort(details, "doc");
+    els.docTabs.appendChild(details);
   });
 }
 
@@ -698,18 +758,23 @@ function showPrecisionLoupe(clientX,clientY,xPct,yPct){
   if(!els.precisionLoupe || !els.precisionLoupeCanvas || !currentPage()) return;
   const rect=els.previewCanvas.getBoundingClientRect();
   const canvas=els.precisionLoupeCanvas, ctx=canvas.getContext("2d");
-  const src=currentPage().sourceCanvas, sx=xPct/100*src.width, sy=yPct/100*src.height, size=44;
+  const src=currentPage().sourceCanvas, sx=xPct/100*src.width, sy=yPct/100*src.height, size=86;
   ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.imageSmoothingEnabled=false;
   ctx.drawImage(src, sx-size/2, sy-size/2, size, size, 0, 0, canvas.width, canvas.height);
   ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue("--action").trim() || "#e85145";
   ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(canvas.width/2,0); ctx.lineTo(canvas.width/2,canvas.height); ctx.moveTo(0,canvas.height/2); ctx.lineTo(canvas.width,canvas.height/2); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(canvas.width/2,0); ctx.lineTo(canvas.width/2,canvas.height);
+  ctx.moveTo(0,canvas.height/2); ctx.lineTo(canvas.width,canvas.height/2);
+  ctx.stroke();
   if(els.precisionLoupeText) els.precisionLoupeText.textContent=`${xPct.toFixed(1)}%, ${yPct.toFixed(1)}%`;
   const preferRight=clientX<window.innerWidth/2, preferBelow=clientY<window.innerHeight/2;
-  const left=preferRight?Math.min(rect.width-140,(clientX-rect.left)+34):Math.max(8,(clientX-rect.left)-150);
-  const top=preferBelow?Math.min(rect.height-150,(clientY-rect.top)+30):Math.max(8,(clientY-rect.top)-158);
-  els.precisionLoupe.style.left=left+"px"; els.precisionLoupe.style.top=top+"px"; els.precisionLoupe.hidden=false;
+  const left=preferRight?Math.min(rect.width-190,(clientX-rect.left)+34):Math.max(8,(clientX-rect.left)-200);
+  const top=preferBelow?Math.min(rect.height-208,(clientY-rect.top)+30):Math.max(8,(clientY-rect.top)-216);
+  els.precisionLoupe.style.left=left+"px";
+  els.precisionLoupe.style.top=top+"px";
+  els.precisionLoupe.hidden=false;
 }
 function hidePrecisionLoupe(){ if(els.precisionLoupe) els.precisionLoupe.hidden=true; }
 
@@ -730,48 +795,79 @@ function setHandle(handle,x,y){
 
 function autoCorners(){
   const p=currentPage(); if(!p)return;
-  const c=applyFilters(p.sourceCanvas,p.adjust);
+  const src=applyFilters(p.sourceCanvas,{...p.adjust,perspective:false});
+  const max=900, scale=Math.min(1,max/Math.max(src.width,src.height));
+  const c=document.createElement("canvas");
+  c.width=Math.max(1,Math.round(src.width*scale));
+  c.height=Math.max(1,Math.round(src.height*scale));
   const ctx=c.getContext("2d",{willReadFrequently:true});
-  const sampleW = 700;
-  const scale = Math.min(1, sampleW / c.width);
-  const work = document.createElement("canvas");
-  work.width = Math.round(c.width*scale);
-  work.height = Math.round(c.height*scale);
-  const wctx = work.getContext("2d",{willReadFrequently:true});
-  wctx.drawImage(c,0,0,work.width,work.height);
-  const img=wctx.getImageData(0,0,work.width,work.height);
-  const d=img.data, w=work.width,h=work.height;
+  ctx.drawImage(src,0,0,c.width,c.height);
+  const img=ctx.getImageData(0,0,c.width,c.height);
+  const d=img.data,w=c.width,h=c.height;
+  const lumAt=(x,y)=>{const i=(y*w+x)*4;return .2126*d[i]+.7152*d[i+1]+.0722*d[i+2];};
 
-  const border = [];
-  const centerX=w/2, centerY=h/2;
+  // estima fundo pelas bordas externas
+  const samples=[];
+  for(let x=0;x<w;x+=6){samples.push(lumAt(x,0));samples.push(lumAt(x,h-1));}
+  for(let y=0;y<h;y+=6){samples.push(lumAt(0,y));samples.push(lumAt(w-1,y));}
+  samples.sort((a,b)=>a-b);
+  const bg=samples[Math.floor(samples.length*.72)] || 245;
+  const diffThreshold=Math.max(14, Math.min(52, Math.abs(bg-128)*0.18+22));
+
+  const rowScore=new Array(h).fill(0), colScore=new Array(w).fill(0);
   for(let y=1;y<h-1;y+=2){
+    let count=0;
     for(let x=1;x<w-1;x+=2){
-      const i=(y*w+x)*4;
-      const lum=.2126*d[i]+.7152*d[i+1]+.0722*d[i+2];
-      const il=((y*w+x-1)*4), ir=((y*w+x+1)*4), iu=(((y-1)*w+x)*4), id=(((y+1)*w+x)*4);
-      const lx=.2126*d[il]+.7152*d[il+1]+.0722*d[il+2], rx=.2126*d[ir]+.7152*d[ir+1]+.0722*d[ir+2];
-      const uy=.2126*d[iu]+.7152*d[iu+1]+.0722*d[iu+2], dy=.2126*d[id]+.7152*d[id+1]+.0722*d[id+2];
-      const grad=Math.abs(rx-lx)+Math.abs(dy-uy);
-      if(grad>38 || lum<225) border.push([x,y]);
+      const l=lumAt(x,y);
+      const gx=Math.abs(lumAt(x+1,y)-lumAt(x-1,y));
+      const gy=Math.abs(lumAt(x,y+1)-lumAt(x,y-1));
+      if(Math.abs(l-bg)>diffThreshold || gx+gy>42) count++;
     }
+    rowScore[y]=count/(w/2);
   }
-  if(border.length<30){setStatus("Não detectei bordas úteis. Use os cantos manuais.");return;}
+  for(let x=1;x<w-1;x+=2){
+    let count=0;
+    for(let y=1;y<h-1;y+=2){
+      const l=lumAt(x,y);
+      const gx=Math.abs(lumAt(x+1,y)-lumAt(x-1,y));
+      const gy=Math.abs(lumAt(x,y+1)-lumAt(x,y-1));
+      if(Math.abs(l-bg)>diffThreshold || gx+gy>42) count++;
+    }
+    colScore[x]=count/(h/2);
+  }
+  const smooth=(arr,win=9)=>arr.map((_,i)=>{
+    let s=0,n=0;
+    for(let j=Math.max(0,i-win);j<=Math.min(arr.length-1,i+win);j++){s+=arr[j];n++;}
+    return s/n;
+  });
+  const rs=smooth(rowScore), cs=smooth(colScore);
+  const minFrac=.025;
+  let top=rs.findIndex(v=>v>minFrac);
+  let bottom=rs.length-1-[...rs].reverse().findIndex(v=>v>minFrac);
+  let left=cs.findIndex(v=>v>minFrac);
+  let right=cs.length-1-[...cs].reverse().findIndex(v=>v>minFrac);
 
-  const quadrants = [[],[],[],[]];
-  for(const [x,y] of border){
-    const q = x<centerX && y<centerY ? 0 : x>=centerX && y<centerY ? 1 : x>=centerX && y>=centerY ? 2 : 3;
-    quadrants[q].push([x,y]);
+  if(top<0||left<0||bottom<=top||right<=left || (right-left)<w*.18 || (bottom-top)<h*.18){
+    setStatus("Não detectei bordas com segurança. Use os vértices manuais.");
+    return;
   }
-  if(quadrants.some(q=>q.length<5)){
-    const xs=border.map(p=>p[0]), ys=border.map(p=>p[1]);
-    setBoxCorners(p, Math.min(...xs)/w*100, Math.min(...ys)/h*100, Math.max(...xs)/w*100, Math.max(...ys)/h*100);
-  } else {
-    const targets = [[0,0],[w,0],[w,h],[0,h]];
-    const pts = quadrants.map((q,idx)=>q.reduce((best,pt)=>dist2(pt,targets[idx])<dist2(best,targets[idx])?pt:best,q[0]));
-    p.adjust.corners = pts.map(([x,y])=>({x:x/w*100,y:y/h*100}));
-  }
-  render();
-  setStatus("Bordas detectadas. Confira, porque foto com sombra ainda engana algoritmo como testemunha treinada.");
+
+  const pad=Math.round(Math.min(w,h)*.012);
+  left=clamp(left-pad,0,w-1); right=clamp(right+pad,left+1,w-1);
+  top=clamp(top-pad,0,h-1); bottom=clamp(bottom+pad,top+1,h-1);
+
+  p.adjust.corners=[
+    {x:left/w*100,y:top/h*100},
+    {x:right/w*100,y:top/h*100},
+    {x:right/w*100,y:bottom/h*100},
+    {x:left/w*100,y:bottom/h*100}
+  ];
+  p.adjust.perspective=true;
+  if(els.perspectiveEnabled) els.perspectiveEnabled.checked=true;
+  syncEdges(p.adjust.corners);
+  renderPreview();
+  renderPageFilmstrip();
+  setStatus("Bordas detectadas. Confira e ajuste fino com a lupa se necessário.");
 }
 function dist2(a,b){return (a[0]-b[0])**2+(a[1]-b[1])**2}
 function setBoxCorners(p,l,t,r,b){p.adjust.corners=[{x:l,y:t},{x:r,y:t},{x:r,y:b},{x:l,y:b}]}

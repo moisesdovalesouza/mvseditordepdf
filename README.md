@@ -91,3 +91,15 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Durante o ajuste manual, aparece uma lupa de precisão do lado oposto ao ponteiro.
 - Capa, timbre e visual agora ficam em card recolhível.
 - Miniaturas da etapa 3 mostram as folhas montadas com múltiplas faces.
+
+
+## v23
+
+- Etapa 1 reorganizada como índice recolhível de Docs.
+- Cada Doc permite editar número, título e classificação no próprio card.
+- Anexos aparecem dentro do respectivo Doc e permitem editar título, classificação e exibição na capa.
+- O antigo card separado de informações do Doc foi removido da interface visível.
+- Card de capa/timbre/visual continua recolhível apenas no seu próprio bloco, sem recolher a coluna inteira.
+- Alças de vértices e lados foram reduzidas para 9px/11px, mais discretas e translúcidas.
+- Lupa de precisão ficou maior e mostra área mais ampla ao redor do ponto.
+- Detectar bordas recebeu nova análise por varredura horizontal/vertical de contraste e luminância.

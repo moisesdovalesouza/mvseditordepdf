@@ -126,7 +126,7 @@
               <div>
                 <span class="card-icon">📄</span>
                 <h2>Docs do projeto</h2>
-                <p>Arraste para reordenar. Cada Doc guarda seus próprios anexos.</p>
+                <p>Índice recolhível: edite número, título, classificação e anexos dentro do próprio Doc.</p>
               </div>
               <button id="addDocBtn" class="ghost">+ Novo Doc</button>
             </div>
@@ -174,25 +174,6 @@
                 <input id="fontLibreRegular" type="file" accept=".ttf,.otf,font/*" />
               </label>
             </details>
-          </section>
-            <section class="card doc-info-card">
-            <div class="card-title">
-              <span class="card-icon">i</span>
-              <div>
-                <h2>Informações do Doc</h2>
-                <p>Servem para capa, rodapé e nome do arquivo.</p>
-              </div>
-            </div>
-            <label>Número do Doc
-              <input id="docNumber" type="text" placeholder="Ex.: Doc. 01" />
-            </label>
-            <label>Título do Doc, opcional
-              <input id="docTitle" type="text" placeholder="Ex.: Documentos de instrução" />
-            </label>
-            <label>Classificação padrão do Doc
-              <select id="docClassification"></select>
-            </label>
-            <p class="hint">Se não houver título, a classificação pode aparecer no rodapé. O nome do arquivo original não será usado automaticamente como título.</p>
           </section>
           </aside>
         </div>
@@ -456,7 +437,13 @@
           </div>
         </div>
       </section>
-    </main>
+    
+    <div id="docHiddenFields" hidden>
+      <input id="docNumber" type="text" />
+      <input id="docTitle" type="text" />
+      <select id="docClassification"></select>
+    </div>
+</main>
 
 
     <div id="confirmModal" class="modal-backdrop" hidden aria-hidden="true">
