@@ -39,16 +39,23 @@
     </header>
 
     <nav class="steps" aria-label="Etapas">
-      <button class="step active" data-step="1"><span>1</span><strong>Projeto e arquivos</strong><small>Docs, anexos e classificação</small></button>
-      <button class="step" data-step="2"><span>2</span><strong>Edição e montagem</strong><small>Páginas, OCR e faces em A4</small></button>
+      <button class="step active" data-step="1"><span>1</span><strong>Arquivos e Docs</strong><small>Enviar, agrupar e organizar</small></button>
+      <button class="step" data-step="2"><span>2</span><strong>Edição, capa e montagem</strong><small>Perspectiva, visual, OCR e A4</small></button>
       <button class="step" data-step="3"><span>3</span><strong>Conferência e envio</strong><small>Ordem final, PDF ou ZIP</small></button>
     </nav>
 
     <main>
       <section id="step1" class="step-panel active">
-        <div class="grid project-grid">
-          <div class="project-main">
-            <section class="card upload-card">
+        <div class="step-section-heading">
+          <span class="card-icon">1</span>
+          <div>
+            <h2>Arquivos e Docs</h2>
+            <p>Primeiro entram os arquivos; depois o projeto é organizado em Docs, anexos e faces.</p>
+          </div>
+        </div>
+
+        <div class="grid step1-split-grid">
+          <section class="card upload-card">
             <div class="card-title horizontal">
               <div>
                 <span class="card-icon">⇧</span>
@@ -121,7 +128,8 @@
 
             <div id="attachmentList" class="attachment-list mixed"></div>
           </section>
-            <section class="card docs-card">
+
+          <section class="card docs-card">
             <div class="card-title horizontal">
               <div>
                 <span class="card-icon">📄</span>
@@ -133,22 +141,59 @@
             <button id="renumberDocsBtn" class="ghost small">Renumerar Docs</button>
             <div id="docTabs" class="doc-tabs"></div>
           </section>
-          </div>
-          <aside class="project-side">
-            <section class="card config-card">
+        </div>
+
+        <div class="footer-nav"><span></span><button class="primary next" data-next="2">Avançar</button></div>
+      </section>
+
+      <section id="step2" class="step-panel">
+        <div class="grid edit-grid">
+          <aside class="card sidebar">
             <div class="card-title">
-              <span class="card-icon">⚙</span>
-              <div>
-                <h2>Configuração inicial</h2>
-                <p>Capa, timbre, modelo visual e fontes do projeto.</p>
-              </div>
+              <h2>Estrutura</h2>
+              <p>Projeto › Docs › Anexos. Escolha o ponto de edição.</p>
             </div>
+            <label>Doc
+              <select id="editDocSelect"></select>
+            </label>
+            <label>Anexo
+              <select id="editAttachmentSelect"></select>
+            </label>
+            <div id="attachmentThumbStrip" class="attachment-thumb-strip"></div>
 
-            <p class="hint">As opções de capa, timbre e modelo visual foram movidas para a etapa 2, onde é possível conferir a prévia antes de exportar.</p>
-
-            <details class="font-details">
-              <summary>Fontes do PDF e da capa</summary>
-              <p class="hint">A interface já usa fontes sóbrias do sistema/web. Para embutir fonte no PDF com fidelidade absoluta, envie .ttf ou .otf.</p>
+            <div class="left-visual-stack">
+            <details class="card collapsible-card visual-model-card">
+              <summary>
+                <span class="card-icon">▣</span>
+                <span>
+                  <strong>Capa, timbre, visual e fontes</strong>
+                  <small>Modelo visual, capa, timbre e fontes usadas no PDF.</small>
+                </span>
+              </summary>
+              <div class="details-body">
+                <label class="checkline"><input id="includeCover" type="checkbox" /> Incluir capa</label>
+                <label class="checkline"><input id="includeLetterhead" type="checkbox" /> Incluir timbrado</label>
+                <label>Modelo visual global
+                  <select id="globalTemplate">
+                    <option value="none" selected>Nenhum</option>
+                    <option value="mvs">MVS Advogado</option>
+                    <option value="gdv">GdV Advogados</option>
+                  </select>
+                </label>
+                <div class="template-preview-grid" aria-label="Prévia visual do modelo">
+                  <div class="template-preview-card">
+                    <span>Capa</span>
+                    <canvas id="coverTemplatePreview" width="120" height="170"></canvas>
+                  </div>
+                  <div class="template-preview-card">
+                    <span>Timbrado</span>
+                    <canvas id="letterheadTemplatePreview" width="120" height="170"></canvas>
+                  </div>
+                </div>
+                <p class="hint">Capa e timbre são fundos fixos. Ajustes de perspectiva, borda, filtro e rotação só alteram documentos.</p>
+                <details class="font-details">
+              <summary>Fontes do PDF, capa e cabeçalho</summary>
+              <p class="hint">A interface usa fontes sóbrias do sistema/web. Para embutir fonte no PDF com fidelidade absoluta, envie .ttf ou .otf.</p>
               <label>Fonte principal
                 <select id="fontPresetSelect" class="font-preview-select">
                   <option value="montserrat" style="font-family: Montserrat, Arial, sans-serif;">Montserrat</option>
@@ -174,27 +219,9 @@
                 <input id="fontLibreRegular" type="file" accept=".ttf,.otf,font/*" />
               </label>
             </details>
-          </section>
-          </aside>
-        </div>
-
-        <div class="footer-nav"><span></span><button class="primary next" data-next="2">Avançar</button></div>
-      </section>
-
-      <section id="step2" class="step-panel">
-        <div class="grid edit-grid">
-          <aside class="card sidebar">
-            <div class="card-title">
-              <h2>Estrutura</h2>
-              <p>Projeto › Docs › Anexos. Escolha o ponto de edição.</p>
+              </div>
+            </details>
             </div>
-            <label>Doc
-              <select id="editDocSelect"></select>
-            </label>
-            <label>Anexo
-              <select id="editAttachmentSelect"></select>
-            </label>
-            <div id="attachmentThumbStrip" class="attachment-thumb-strip"></div>
           </aside>
 
           <section class="card preview-card">
@@ -249,138 +276,140 @@
           </section>
 
           <aside class="controls-panel">
-        <details class="card visual-model-card">
-          <summary>
-            <span class="card-icon">▣</span>
-            <span>
-              <strong>Capa, timbre e visual</strong>
-              <small>Prévia do modelo sem alterar os documentos.</small>
-            </span>
-          </summary>
-          <div class="details-body">
-          <label class="checkline"><input id="includeCover" type="checkbox" /> Incluir capa</label>
-          <label class="checkline"><input id="includeLetterhead" type="checkbox" /> Incluir timbrado</label>
-          <label>Modelo visual global
-            <select id="globalTemplate">
-              <option value="none" selected>Nenhum</option>
-              <option value="mvs">MVS Advogado</option>
-              <option value="gdv">GdV Advogados</option>
-            </select>
-          </label>
-          <div class="template-preview-grid" aria-label="Prévia visual do modelo">
-            <div class="template-preview-card">
-              <span>Capa</span>
-              <canvas id="coverTemplatePreview" width="120" height="170"></canvas>
-            </div>
-            <div class="template-preview-card">
-              <span>Timbrado</span>
-              <canvas id="letterheadTemplatePreview" width="120" height="170"></canvas>
-            </div>
-          </div>
-          <p class="hint">Capa e timbre são fundos fixos. Só os documentos recebem ajuste de borda, rotação, filtro ou perspectiva.</p>
-        </div>
+            <details class="card collapsible-card">
+              <summary>
+                <span class="card-icon">◫</span>
+                <span>
+                  <strong>Papel e área útil</strong>
+                  <small>Tamanho, orientação e margem do conteúdo.</small>
+                </span>
+              </summary>
+              <div class="details-body">
+                <div class="two-col">
+                  <label>Papel
+                    <select id="paperSize">
+                      <option value="a4" selected>A4</option>
+                      <option value="letter">Carta</option>
+                      <option value="legal">Ofício/Legal</option>
+                    </select>
+                  </label>
+                  <label>Orientação
+                    <select id="orientation">
+                      <option value="portrait" selected>Retrato</option>
+                      <option value="landscape">Paisagem</option>
+                    </select>
+                  </label>
+                </div>
+                <label>Margem do conteúdo: <span id="paperMarginValue">10</span> mm
+                  <input id="paperMargin" type="range" min="0" max="30" value="10" />
+                </label>
+              </div>
+            </details>
 
+            <details class="card collapsible-card" open>
+              <summary>
+                <span class="card-icon">⌖</span>
+                <span>
+                  <strong>Bordas e perspectiva</strong>
+                  <small>Correção individual da página ou face selecionada.</small>
+                </span>
+              </summary>
+              <div class="details-body">
+                <label class="checkline"><input id="perspectiveEnabled" type="checkbox" /> Corrigir perspectiva</label>
+                <div class="two-col">
+                  <label>Topo <span id="edgeTopValue">0</span>%
+                    <input id="edgeTop" type="range" min="0" max="40" value="0" />
+                  </label>
+                  <label>Direita <span id="edgeRightValue">0</span>%
+                    <input id="edgeRight" type="range" min="0" max="40" value="0" />
+                  </label>
+                  <label>Base <span id="edgeBottomValue">0</span>%
+                    <input id="edgeBottom" type="range" min="0" max="40" value="0" />
+                  </label>
+                  <label>Esquerda <span id="edgeLeftValue">0</span>%
+                    <input id="edgeLeft" type="range" min="0" max="40" value="0" />
+                  </label>
+                </div>
+              </div>
+            </details>
 
-        <div class="card">
-            <div class="card-title">
-              <h2>Ajustes da página</h2>
-              <p>Refine somente o necessário. O padrão fica ao final.</p>
-            </div>
-            <details>
-              <summary>Papel e área útil</summary>
-              <div class="two-col">
-                <label>Papel
-                  <select id="paperSize">
-                    <option value="a4" selected>A4</option>
-                    <option value="letter">Carta</option>
-                    <option value="legal">Ofício/Legal</option>
+            <details class="card collapsible-card">
+              <summary>
+                <span class="card-icon">◐</span>
+                <span>
+                  <strong>Aparência e filtros</strong>
+                  <small>Brilho, contraste, scanner e preto/branco.</small>
+                </span>
+              </summary>
+              <div class="details-body">
+                <div class="button-grid">
+                  <button id="scannerPresetBtn" class="small">Scanner P&B</button>
+                  <button id="cleanPresetBtn" class="small">Colorido limpo</button>
+                  <button id="resetFilterBtn" class="small">Original</button>
+                </div>
+                <label>Brilho <span id="brightnessValue">100</span>%
+                  <input id="brightness" type="range" min="50" max="180" value="100" />
+                </label>
+                <label>Contraste <span id="contrastValue">100</span>%
+                  <input id="contrast" type="range" min="50" max="220" value="100" />
+                </label>
+                <label>Saturação <span id="saturationValue">100</span>%
+                  <input id="saturation" type="range" min="0" max="180" value="100" />
+                </label>
+                <label>Escala de cinza <span id="grayscaleValue">0</span>%
+                  <input id="grayscale" type="range" min="0" max="100" value="0" />
+                </label>
+                <label>Preto/branco <span id="thresholdValue">0</span>
+                  <input id="threshold" type="range" min="0" max="255" value="0" />
+                </label>
+              </div>
+            </details>
+
+            <details class="card collapsible-card">
+              <summary>
+                <span class="card-icon">OCR</span>
+                <span>
+                  <strong>Cabeçalho, rodapé e OCR</strong>
+                  <small>Textos finais, numeração e PDF pesquisável.</small>
+                </span>
+              </summary>
+              <div class="details-body">
+                <label class="checkline"><input id="includeHeader" type="checkbox" checked /> Cabeçalho com Doc, título e anexo</label>
+                <label class="checkline"><input id="includePageNumbers" type="checkbox" checked /> Numeração X de X</label>
+                <label class="checkline"><input id="includeFooterInfo" type="checkbox" checked /> Rodapé com classificação</label>
+                <label class="checkline"><input id="embedOcrText" type="checkbox" checked /> PDF pesquisável quando houver OCR</label>
+                <label>Idioma OCR
+                  <select id="ocrLang">
+                    <option value="por" selected>Português</option>
+                    <option value="eng">Inglês</option>
+                    <option value="por+eng">Português + Inglês</option>
                   </select>
                 </label>
-                <label>Orientação
-                  <select id="orientation">
-                    <option value="portrait" selected>Retrato</option>
-                    <option value="landscape">Paisagem</option>
-                  </select>
-                </label>
-              </div>
-              <label>Margem do conteúdo: <span id="paperMarginValue">10</span> mm
-                <input id="paperMargin" type="range" min="0" max="30" value="10" />
-              </label>
-            </details>
-
-            <details>
-              <summary>Bordas e perspectiva</summary>
-              <label class="checkline"><input id="perspectiveEnabled" type="checkbox" /> Corrigir perspectiva</label>
-              <div class="two-col">
-                <label>Topo <span id="edgeTopValue">0</span>%
-                  <input id="edgeTop" type="range" min="0" max="40" value="0" />
-                </label>
-                <label>Direita <span id="edgeRightValue">0</span>%
-                  <input id="edgeRight" type="range" min="0" max="40" value="0" />
-                </label>
-                <label>Base <span id="edgeBottomValue">0</span>%
-                  <input id="edgeBottom" type="range" min="0" max="40" value="0" />
-                </label>
-                <label>Esquerda <span id="edgeLeftValue">0</span>%
-                  <input id="edgeLeft" type="range" min="0" max="40" value="0" />
-                </label>
+                <div class="button-grid">
+                  <button id="ocrPageBtn" class="small">OCR página</button>
+                  <button id="ocrAttachmentBtn" class="small">OCR anexo</button>
+                  <button id="ocrAllBtn" class="small">OCR tudo</button>
+                </div>
               </div>
             </details>
 
-            <details>
-              <summary>Aparência e filtros</summary>
-              <div class="button-grid">
-                <button id="scannerPresetBtn" class="small">Scanner P&B</button>
-                <button id="cleanPresetBtn" class="small">Colorido limpo</button>
-                <button id="resetFilterBtn" class="small">Original</button>
-              </div>
-              <label>Brilho <span id="brightnessValue">100</span>%
-                <input id="brightness" type="range" min="50" max="180" value="100" />
-              </label>
-              <label>Contraste <span id="contrastValue">100</span>%
-                <input id="contrast" type="range" min="50" max="220" value="100" />
-              </label>
-              <label>Saturação <span id="saturationValue">100</span>%
-                <input id="saturation" type="range" min="0" max="180" value="100" />
-              </label>
-              <label>Escala de cinza <span id="grayscaleValue">0</span>%
-                <input id="grayscale" type="range" min="0" max="100" value="0" />
-              </label>
-              <label>Preto/branco <span id="thresholdValue">0</span>
-                <input id="threshold" type="range" min="0" max="255" value="0" />
-              </label>
-            </details>
-
-            <details>
-              <summary>Cabeçalho, rodapé e OCR</summary>
-              <label class="checkline"><input id="includeHeader" type="checkbox" checked /> Cabeçalho com Doc, título e anexo</label>
-              <label class="checkline"><input id="includePageNumbers" type="checkbox" checked /> Numeração X de X</label>
-              <label class="checkline"><input id="includeFooterInfo" type="checkbox" checked /> Rodapé com classificação</label>
-              <label class="checkline"><input id="embedOcrText" type="checkbox" checked /> PDF pesquisável quando houver OCR</label>
-              <label>Idioma OCR
-                <select id="ocrLang">
-                  <option value="por" selected>Português</option>
-                  <option value="eng">Inglês</option>
-                  <option value="por+eng">Português + Inglês</option>
-                </select>
-              </label>
-              <div class="button-grid">
-                <button id="ocrPageBtn" class="small">OCR página</button>
-                <button id="ocrAttachmentBtn" class="small">OCR anexo</button>
-                <button id="ocrAllBtn" class="small">OCR tudo</button>
+            <details class="card collapsible-card apply-panel-card">
+              <summary>
+                <span class="card-icon">↻</span>
+                <span>
+                  <strong>Aplicar padrão atual</strong>
+                  <small>Copia apenas ajustes comuns. Perspectiva continua individual.</small>
+                </span>
+              </summary>
+              <div class="details-body">
+                <p class="hint">Use depois de ajustar aparência, rotação ou margens. A posição dos vértices não será copiada.</p>
+                <div class="button-grid">
+                  <button id="applyToAttachmentBtn" class="small">Ao anexo</button>
+                  <button id="applyToDocBtn" class="small">Ao Doc</button>
+                  <button id="applyToAllBtn" class="small">A todos</button>
+                </div>
               </div>
             </details>
-        </div>
-<div class="apply-panel">
-              <strong>Aplicar padrão atual</strong>
-              <p>Depois de ajustar uma página, aplique ao anexo, ao Doc ou a todos.</p>
-              <div class="button-grid">
-                <button id="applyToAttachmentBtn" class="small">Ao anexo</button>
-                <button id="applyToDocBtn" class="small">Ao Doc</button>
-                <button id="applyToAllBtn" class="small">A todos</button>
-              </div>
-            </div>
-
           </aside>
         </div>
 

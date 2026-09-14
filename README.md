@@ -103,3 +103,13 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Alças de vértices e lados foram reduzidas para 9px/11px, mais discretas e translúcidas.
 - Lupa de precisão ficou maior e mostra área mais ampla ao redor do ponto.
 - Detectar bordas recebeu nova análise por varredura horizontal/vertical de contraste e luminância.
+
+
+## v24
+
+- Etapa 1 simplificada e dividida apenas entre "Enviar arquivos" e "Docs do projeto".
+- Configurações de fontes, capa, timbre e modelo visual saíram da etapa 1.
+- Capa, timbre, visual e fontes foram movidos para a etapa 2, abaixo da estrutura, no lado esquerdo.
+- Na etapa 2, os blocos de configuração agora têm o mesmo nível hierárquico e são cards recolhíveis.
+- Ordem ajustada para uso: Estrutura > Capa/timbre/fontes > Prévia > Papel > Bordas/perspectiva > Filtros > Cabeçalho/OCR > Aplicar padrão.
+- "Aplicar padrão" reforça que a perspectiva e os vértices continuam individuais por face/página.
