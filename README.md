@@ -113,3 +113,14 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Na etapa 2, os blocos de configuração agora têm o mesmo nível hierárquico e são cards recolhíveis.
 - Ordem ajustada para uso: Estrutura > Capa/timbre/fontes > Prévia > Papel > Bordas/perspectiva > Filtros > Cabeçalho/OCR > Aplicar padrão.
 - "Aplicar padrão" reforça que a perspectiva e os vértices continuam individuais por face/página.
+
+
+## v25
+
+- Revisão geral de proporções, grade, colunas, menus, cards e botões.
+- Etapa 1 recebeu grade mais equilibrada entre upload e Docs do projeto.
+- Etapa 2 recebeu ajustes de largura entre estrutura, prévia e controles.
+- Botão de montagem de faces foi refeito para ocupar espaço proporcional ao seletor de organização.
+- Adicionada opção "Abrir câmera" com `capture="environment"` para fotografar documentos no celular.
+- Modo claro/escuro/sistema foi reforçado com `data-theme`, `data-resolved-theme`, classes no body e atualização de meta theme-color.
+- Responsividade revisada para desktop, tablets e celulares.

@@ -105,17 +105,29 @@
               <div id="scanHint" class="hint-box"></div>
             </div>
 
-            <label class="dropzone" id="dropzone">
-              <input id="fileInput" type="file" multiple accept="image/*,application/pdf" />
-              <span class="drop-title">Arraste PDFs ou fotografias aqui</span>
-              <span class="drop-help">ou clique para selecionar do dispositivo</span>
-              <span class="drop-meta">PDF, JPG e PNG · processamento local</span>
-            </label>
+            <div class="upload-entry-grid">
+              <label class="dropzone" id="dropzone">
+                <input id="fileInput" type="file" multiple accept="image/*,application/pdf" />
+                <span class="drop-title">Arraste PDFs ou fotografias aqui</span>
+                <span class="drop-help">ou clique para selecionar do dispositivo</span>
+                <span class="drop-meta">PDF, JPG e PNG · processamento local</span>
+              </label>
+
+              <div class="camera-card">
+                <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
+                <button id="openCameraBtn" type="button" class="camera-btn">
+                  <span class="camera-icon">⌁</span>
+                  <strong>Abrir câmera</strong>
+                  <small>Fotografar documento agora</small>
+                </button>
+                <p class="hint">No celular, abre a câmera traseira quando o navegador permite. No computador, abre seleção de imagem.</p>
+              </div>
+            </div>
 
             <div class="section-actions smart-actions">
               <button id="removeAttachmentBtn" class="small danger" hidden>Remover anexo</button>
-              <button id="mergeSmallDocsBtn" class="small primary">Montar faces em A4</button>
-              <label class="sort-select-label">Organizar anexos
+              <button id="mergeSmallDocsBtn" class="small primary">Aplicar montagem</button>
+              <label class="sort-select-label">Organizar
                 <select id="attachmentSortSelect">
                   <option value="">Escolha a organização</option>
                   <option value="importance">Por importância jurídica</option>

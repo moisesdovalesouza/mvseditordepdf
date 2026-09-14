@@ -1358,9 +1358,11 @@ function bind(){
   els.fontLibreRegular.onchange=async e=>{state.fontBytes.libreRegular=await readFileBytes(e.target.files[0]); setStatus("Libre Baskerville carregada.");};
 
   els.scanType.onchange=renderScanHint;
-  if(els.uploadMode) if(els.uploadMode) els.uploadMode.onchange=renderScanHint;
+  if(els.uploadMode) els.uploadMode.onchange=renderScanHint;
   els.attachmentViewMode.onchange=renderAttachments;
   els.fileInput.onchange=e=>handleFiles(e.target.files);
+  if(els.openCameraBtn && els.cameraInput) els.openCameraBtn.onclick=()=>els.cameraInput.click();
+  if(els.cameraInput) els.cameraInput.onchange=e=>handleFiles(e.target.files);
   ["dragenter","dragover"].forEach(evt=>els.dropzone.addEventListener(evt,e=>{e.preventDefault();els.dropzone.classList.add("dragover")}));
   ["dragleave","drop"].forEach(evt=>els.dropzone.addEventListener(evt,e=>{e.preventDefault();els.dropzone.classList.remove("dragover")}));
   els.dropzone.addEventListener("drop",e=>handleFiles(e.dataTransfer.files));
@@ -1503,15 +1505,39 @@ function setupInteractiveLight(){
 // Tema: Sistema / Claro / Escuro
 (function initMvsThemeSelector(){
   const root=document.documentElement;
+  const body=document.body;
   const buttons=Array.from(document.querySelectorAll('[data-theme-choice]'));
   const storageKey='mvs-pdf-theme';
-  const applyTheme=(choice)=>{
-    const normalized=['system','light','dark'].includes(choice)?choice:'system';
-    root.setAttribute('data-theme',normalized);
-    try{localStorage.setItem(storageKey,normalized)}catch(_){ }
-    buttons.forEach(btn=>{const active=btn.dataset.themeChoice===normalized;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));});
+
+  const media=window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  const themeMetas=Array.from(document.querySelectorAll('meta[name="theme-color"]'));
+
+  const resolvedTheme=(choice)=>{
+    if(choice==='dark') return 'dark';
+    if(choice==='light') return 'light';
+    return media?.matches ? 'dark' : 'light';
   };
+
+  const paint=(choice)=>{
+    const normalized=['system','light','dark'].includes(choice)?choice:'system';
+    const resolved=resolvedTheme(normalized);
+    root.setAttribute('data-theme', normalized);
+    root.setAttribute('data-resolved-theme', resolved);
+    body?.classList.toggle('theme-dark', resolved==='dark');
+    body?.classList.toggle('theme-light', resolved==='light');
+    const color=resolved==='dark' ? '#151c29' : '#f7f3e9';
+    themeMetas.forEach(meta=>meta.setAttribute('content', color));
+    try{localStorage.setItem(storageKey,normalized)}catch(_){}
+    buttons.forEach(btn=>{
+      const active=btn.dataset.themeChoice===normalized;
+      btn.classList.toggle('active',active);
+      btn.setAttribute('aria-pressed',String(active));
+    });
+    try{ window.dispatchEvent(new CustomEvent('mvs-theme-change',{detail:{choice:normalized,resolved}})); }catch(_){}
+  };
+
   const saved=(()=>{try{return localStorage.getItem(storageKey)||'system'}catch(_){return 'system'}})();
-  applyTheme(saved);
-  buttons.forEach(btn=>btn.addEventListener('click',()=>applyTheme(btn.dataset.themeChoice)));
+  paint(saved);
+  buttons.forEach(btn=>btn.addEventListener('click',()=>paint(btn.dataset.themeChoice)));
+  media?.addEventListener?.('change',()=>{ if((localStorage.getItem(storageKey)||'system')==='system') paint('system'); });
 })();
