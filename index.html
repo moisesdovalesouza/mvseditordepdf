@@ -5,60 +5,150 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>MVS Editor de PDF</title>
   <meta name="description" content="Editor de PDF jurídico por etapas, com digitalização, capa, timbre, OCR e exportação." />
-  <meta name="theme-color" content="#17172d" />
+  <meta name="theme-color" content="#f8f6ef" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#101828" media="(prefers-color-scheme: dark)" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="./icons/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="./icons/favicon.svg" />
+  <link rel="icon" href="./icons/favicon.ico" sizes="any" />
+  <link rel="icon" href="./icons/icon-32.png" type="image/png" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="MVS PDF" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
+  <div class="app-ambient" aria-hidden="true"></div>
   <div class="shell">
     <header class="app-header">
       <div class="brand">
-        <img src="./icons/favicon.svg" alt="MVS Editor de PDF" class="brand-logo app-icon-logo" />
+        <img src="./icons/icon-192.png" alt="MVS Editor de PDF" class="brand-logo app-icon-logo" />
         <div>
-          <p class="eyebrow">Editor jurídico instalável</p>
+          <p class="eyebrow">Processamento local</p>
           <h1>MVS Editor de PDF</h1>
-          <p class="subtitle">Organize Docs, classifique anexos, corrija páginas e exporte PDFs com capa e timbre.</p>
+          <p class="subtitle">Projeto, Docs, anexos e páginas em fluxo jurídico.</p>
         </div>
       </div>
       <div class="header-actions">
-        <button id="installBtn" class="ghost" hidden>Instalar app</button>
+        <div class="theme-switch" role="group" aria-label="Tema do aplicativo">
+          <button type="button" class="theme-option active" data-theme-choice="system" aria-pressed="true">Sistema</button>
+          <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">Claro</button>
+          <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="false">Escuro</button>
+        </div>
+        <button id="installBtn" class="ghost install-cta" hidden>Instalar app</button>
       </div>
     </header>
 
     <nav class="steps" aria-label="Etapas">
-      <button class="step active" data-step="1"><span>1</span><strong>Upload e organização</strong><small>Docs, anexos e classificação</small></button>
-      <button class="step" data-step="2"><span>2</span><strong>Edição e padrão</strong><small>Bordas, filtros, OCR e páginas</small></button>
-      <button class="step" data-step="3"><span>3</span><strong>Prévia e exportação</strong><small>Conferir, gerar e baixar</small></button>
+      <button class="step active" data-step="1"><span>1</span><strong>Projeto e arquivos</strong><small>Docs, anexos e classificação</small></button>
+      <button class="step" data-step="2"><span>2</span><strong>Edição e montagem</strong><small>Páginas, OCR e faces em A4</small></button>
+      <button class="step" data-step="3"><span>3</span><strong>Conferência e envio</strong><small>Ordem final, PDF ou ZIP</small></button>
     </nav>
 
     <main>
       <section id="step1" class="step-panel active">
-        <div class="grid setup-grid">
-          <aside class="card">
-            <div class="card-title">
-              <h2>Configuração inicial</h2>
-              <p>O modelo visual é global. Padrão: nenhum.</p>
+        <div class="grid project-grid">
+          <div class="project-main">
+            <section class="card upload-card">
+            <div class="card-title horizontal">
+              <div>
+                <span class="card-icon">⇧</span>
+                <h2>Enviar arquivos</h2>
+                <p>PDFs e imagens entram no Doc selecionado e podem virar anexos ou faces na mesma folha.</p>
+              </div>
+              <label class="view-mode">Visualização
+                <select id="attachmentViewMode">
+                  <option value="list">Lista</option>
+                  <option value="thumbs">Miniaturas</option>
+                  <option value="mixed" selected>Lista com miniaturas</option>
+                </select>
+              </label>
             </div>
 
-            <label class="checkline"><input id="includeCover" type="checkbox" /> Incluir capa</label>
-            <label class="checkline"><input id="includeLetterhead" type="checkbox" /> Incluir timbrado</label>
+            <div class="upload-helper">
+              <label>Tipo do documento a digitalizar
+                <select id="scanType">
+                  <option value="standard" selected>Documento A4 ou PDF comum</option>
+                  <option value="id-front-back">Identificação frente e verso na mesma página</option>
+                  <option value="small-multipage">Documento pequeno com várias páginas</option>
+                  <option value="professional-id">Carteira profissional: OAB, CRM, CRP etc.</option>
+                  <option value="passport">Passaporte</option>
+                  <option value="ctps">CTPS</option>
+                  <option value="photo-grid">Fotografias — várias por folha A4</option>
+                  <option value="multi-faces">Até 6 faces por anexo/folha A4</option>
+                </select>
+              </label>
+              <div class="two-col upload-mode-grid">
+                <label>Como anexar
+                  <select id="uploadMode">
+                    <option value="new-attachment" selected>Cada arquivo vira um anexo</option>
+                    <option value="doc-per-file">Cada arquivo vira um Doc</option>
+                    <option value="append-active">Adicionar ao anexo selecionado</option>
+                    <option value="group-selection">Montar várias faces por folha</option>
+                  </select>
+                </label>
+                <label id="facesPerSheetWrap" class="faces-per-sheet-wrap">Faces por folha A4
+                  <select id="facesPerSheet">
+                    <option value="2" selected>2 faces por folha</option>
+                    <option value="4">4 faces por folha</option>
+                    <option value="6">6 faces por folha</option>
+                  </select>
+                </label>
+              </div>
+              <p class="hint no-distort-rule">Regra fixa: nunca esticar, cortar ou deformar. O app reduz, centraliza e gira apenas quando isso melhorar o encaixe.</p>
+              <div id="scanHint" class="hint-box"></div>
+            </div>
 
-            <label>Modelo visual global
-              <select id="globalTemplate">
-                <option value="none" selected>Nenhum</option>
-                <option value="mvs">MVS Advogado</option>
-                <option value="gdv">GdV Advogados</option>
-              </select>
+            <label class="dropzone" id="dropzone">
+              <input id="fileInput" type="file" multiple accept="image/*,application/pdf" />
+              <span class="drop-title">Arraste PDFs ou fotografias aqui</span>
+              <span class="drop-help">ou clique para selecionar do dispositivo</span>
+              <span class="drop-meta">PDF, JPG e PNG · processamento local</span>
             </label>
+
+            <div class="section-actions smart-actions">
+              <button id="removeAttachmentBtn" class="small danger" hidden>Remover anexo</button>
+              <button id="mergeSmallDocsBtn" class="small primary">Montar faces em A4</button>
+              <label class="sort-select-label">Organizar anexos
+                <select id="attachmentSortSelect">
+                  <option value="">Escolha a organização</option>
+                  <option value="importance">Por importância jurídica</option>
+                  <option value="alpha">Ordem alfabética</option>
+                  <option value="type">Tipo de arquivo</option>
+                  <option value="date">Data do arquivo</option>
+                </select>
+              </label>
+            </div>
+
+            <div id="attachmentList" class="attachment-list mixed"></div>
+          </section>
+            <section class="card docs-card">
+            <div class="card-title horizontal">
+              <div>
+                <span class="card-icon">📄</span>
+                <h2>Docs do projeto</h2>
+                <p>Arraste para reordenar. Cada Doc guarda seus próprios anexos.</p>
+              </div>
+              <button id="addDocBtn" class="ghost">+ Novo Doc</button>
+            </div>
+            <button id="renumberDocsBtn" class="ghost small">Renumerar Docs</button>
+            <div id="docTabs" class="doc-tabs"></div>
+          </section>
+          </div>
+          <aside class="project-side">
+            <section class="card config-card">
+            <div class="card-title">
+              <span class="card-icon">⚙</span>
+              <div>
+                <h2>Configuração inicial</h2>
+                <p>Capa, timbre, modelo visual e fontes do projeto.</p>
+              </div>
+            </div>
+
+            <p class="hint">As opções de capa, timbre e modelo visual foram movidas para a etapa 2, onde é possível conferir a prévia antes de exportar.</p>
 
             <details class="font-details">
               <summary>Fontes do PDF e da capa</summary>
-              <p class="hint">A interface usa Montserrat, Libre Baskerville, Inter e Source Serif quando disponíveis. O carregamento manual de .ttf ou .otf fica preservado para fidelidade no PDF.</p>
+              <p class="hint">A interface já usa fontes sóbrias do sistema/web. Para embutir fonte no PDF com fidelidade absoluta, envie .ttf ou .otf.</p>
               <label>Fonte principal
                 <select id="fontPresetSelect" class="font-preview-select">
                   <option value="montserrat" style="font-family: Montserrat, Arial, sans-serif;">Montserrat</option>
@@ -84,67 +174,14 @@
                 <input id="fontLibreRegular" type="file" accept=".ttf,.otf,font/*" />
               </label>
             </details>
-
-            <hr />
-
-            <div class="card-title compact">
-              <h2>Docs do projeto</h2>
-              <p>Campos vazios por padrão.</p>
-            </div>
-            <div class="button-grid">
-              <button id="addDocBtn">+ Novo Doc</button>
-              <button id="renumberDocsBtn" class="ghost">Renumerar</button>
-            </div>
-            <div id="docTabs" class="doc-tabs"></div>
-          </aside>
-
-          <section class="card">
-            <div class="card-title horizontal">
-              <div>
-                <h2>Upload dos anexos</h2>
-                <p>Cada arquivo vira um anexo dentro do Doc selecionado.</p>
-              </div>
-              <label class="view-mode">Visualização
-                <select id="attachmentViewMode">
-                  <option value="list">Lista</option>
-                  <option value="thumbs">Miniaturas</option>
-                  <option value="mixed" selected>Lista com miniaturas</option>
-                </select>
-              </label>
-            </div>
-
-            <div class="upload-helper">
-              <label>Tipo do documento a digitalizar
-                <select id="scanType">
-                  <option value="standard" selected>Documento A4 ou PDF comum</option>
-                  <option value="id-front-back">Identificação frente e verso na mesma página</option>
-                  <option value="small-multipage">Documento pequeno com várias páginas</option>
-                  <option value="professional-id">Carteira profissional: OAB, CRM, CRP etc.</option>
-                  <option value="passport">Passaporte</option>
-                  <option value="ctps">CTPS</option>
-                </select>
-              </label>
-              <div id="scanHint" class="hint-box"></div>
-            </div>
-
-            <label class="dropzone" id="dropzone">
-              <input id="fileInput" type="file" multiple accept="image/*,application/pdf" />
-              <span class="drop-title">Arraste ou selecione os arquivos</span>
-              <span class="drop-help">A ordem inicial segue o upload. Depois arraste os anexos para reorganizar.</span>
-            </label>
-
-            <div class="section-actions">
-              <button id="removeAttachmentBtn" class="small danger">Remover anexo</button>
-              <button id="mergeSmallDocsBtn" class="small">Juntar frente/verso em A4</button>
-            </div>
-
-            <div id="attachmentList" class="attachment-list mixed"></div>
           </section>
-
-          <aside class="card">
+            <section class="card doc-info-card">
             <div class="card-title">
-              <h2>Informações do Doc</h2>
-              <p>Servem para capa, rodapé e nome do arquivo.</p>
+              <span class="card-icon">i</span>
+              <div>
+                <h2>Informações do Doc</h2>
+                <p>Servem para capa, rodapé e nome do arquivo.</p>
+              </div>
             </div>
             <label>Número do Doc
               <input id="docNumber" type="text" placeholder="Ex.: Doc. 01" />
@@ -156,6 +193,7 @@
               <select id="docClassification"></select>
             </label>
             <p class="hint">Se não houver título, a classificação pode aparecer no rodapé. O nome do arquivo original não será usado automaticamente como título.</p>
+          </section>
           </aside>
         </div>
 
@@ -166,8 +204,8 @@
         <div class="grid edit-grid">
           <aside class="card sidebar">
             <div class="card-title">
-              <h2>Selecionar página</h2>
-              <p>Escolha Doc e anexo. As páginas aparecem abaixo da prévia em miniaturas horizontais.</p>
+              <h2>Estrutura</h2>
+              <p>Projeto › Docs › Anexos. Escolha o ponto de edição.</p>
             </div>
             <label>Doc
               <select id="editDocSelect"></select>
@@ -181,7 +219,7 @@
           <section class="card preview-card">
             <div class="card-title horizontal">
               <div>
-                <h2>Prévia editável</h2>
+                <h2>Prévia da página</h2>
                 <p id="selectedPageInfo">Nenhuma página selecionada.</p>
               </div>
               <div class="section-actions">
@@ -205,6 +243,10 @@
                   <button class="drag edge" data-handle="right"></button>
                   <button class="drag edge" data-handle="bottom"></button>
                   <button class="drag edge" data-handle="left"></button>
+                  <div id="precisionLoupe" class="precision-loupe" hidden>
+                    <canvas id="precisionLoupeCanvas" width="112" height="112"></canvas>
+                    <span id="precisionLoupeText">0%, 0%</span>
+                  </div>
                 </div>
               </div>
               <p id="emptyCanvas" class="empty">Envie arquivos na etapa 1.</p>
@@ -225,19 +267,59 @@
             </label>
           </section>
 
-          <aside class="card controls">
+          <aside class="controls-panel">
+        <details class="card visual-model-card">
+          <summary>
+            <span class="card-icon">▣</span>
+            <span>
+              <strong>Capa, timbre e visual</strong>
+              <small>Prévia do modelo sem alterar os documentos.</small>
+            </span>
+          </summary>
+          <div class="details-body">
+          <label class="checkline"><input id="includeCover" type="checkbox" /> Incluir capa</label>
+          <label class="checkline"><input id="includeLetterhead" type="checkbox" /> Incluir timbrado</label>
+          <label>Modelo visual global
+            <select id="globalTemplate">
+              <option value="none" selected>Nenhum</option>
+              <option value="mvs">MVS Advogado</option>
+              <option value="gdv">GdV Advogados</option>
+            </select>
+          </label>
+          <div class="template-preview-grid" aria-label="Prévia visual do modelo">
+            <div class="template-preview-card">
+              <span>Capa</span>
+              <canvas id="coverTemplatePreview" width="120" height="170"></canvas>
+            </div>
+            <div class="template-preview-card">
+              <span>Timbrado</span>
+              <canvas id="letterheadTemplatePreview" width="120" height="170"></canvas>
+            </div>
+          </div>
+          <p class="hint">Capa e timbre são fundos fixos. Só os documentos recebem ajuste de borda, rotação, filtro ou perspectiva.</p>
+        </div>
+
+
+        <div class="card">
             <div class="card-title">
-              <h2>Ajustes</h2>
-              <p>Abra apenas o bloco necessário. O aplicar padrão fica sempre visível.</p>
+              <h2>Ajustes da página</h2>
+              <p>Refine somente o necessário. O padrão fica ao final.</p>
             </div>
             <details>
               <summary>Papel e área útil</summary>
               <div class="two-col">
                 <label>Papel
-                  <select id="paperSize"><option value="a4" selected>A4</option><option value="letter">Carta</option><option value="legal">Ofício/Legal</option></select>
+                  <select id="paperSize">
+                    <option value="a4" selected>A4</option>
+                    <option value="letter">Carta</option>
+                    <option value="legal">Ofício/Legal</option>
+                  </select>
                 </label>
                 <label>Orientação
-                  <select id="orientation"><option value="portrait" selected>Retrato</option><option value="landscape">Paisagem</option></select>
+                  <select id="orientation">
+                    <option value="portrait" selected>Retrato</option>
+                    <option value="landscape">Paisagem</option>
+                  </select>
                 </label>
               </div>
               <label>Margem do conteúdo: <span id="paperMarginValue">10</span> mm
@@ -247,12 +329,20 @@
 
             <details>
               <summary>Bordas e perspectiva</summary>
-              <label class="checkline"><input id="perspectiveEnabled" type="checkbox" checked /> Corrigir perspectiva</label>
+              <label class="checkline"><input id="perspectiveEnabled" type="checkbox" /> Corrigir perspectiva</label>
               <div class="two-col">
-                <label>Topo <span id="edgeTopValue">0</span>%<input id="edgeTop" type="range" min="0" max="40" value="0" /></label>
-                <label>Direita <span id="edgeRightValue">0</span>%<input id="edgeRight" type="range" min="0" max="40" value="0" /></label>
-                <label>Base <span id="edgeBottomValue">0</span>%<input id="edgeBottom" type="range" min="0" max="40" value="0" /></label>
-                <label>Esquerda <span id="edgeLeftValue">0</span>%<input id="edgeLeft" type="range" min="0" max="40" value="0" /></label>
+                <label>Topo <span id="edgeTopValue">0</span>%
+                  <input id="edgeTop" type="range" min="0" max="40" value="0" />
+                </label>
+                <label>Direita <span id="edgeRightValue">0</span>%
+                  <input id="edgeRight" type="range" min="0" max="40" value="0" />
+                </label>
+                <label>Base <span id="edgeBottomValue">0</span>%
+                  <input id="edgeBottom" type="range" min="0" max="40" value="0" />
+                </label>
+                <label>Esquerda <span id="edgeLeftValue">0</span>%
+                  <input id="edgeLeft" type="range" min="0" max="40" value="0" />
+                </label>
               </div>
             </details>
 
@@ -263,11 +353,21 @@
                 <button id="cleanPresetBtn" class="small">Colorido limpo</button>
                 <button id="resetFilterBtn" class="small">Original</button>
               </div>
-              <label>Brilho <span id="brightnessValue">100</span>%<input id="brightness" type="range" min="50" max="180" value="100" /></label>
-              <label>Contraste <span id="contrastValue">100</span>%<input id="contrast" type="range" min="50" max="220" value="100" /></label>
-              <label>Saturação <span id="saturationValue">100</span>%<input id="saturation" type="range" min="0" max="180" value="100" /></label>
-              <label>Escala de cinza <span id="grayscaleValue">0</span>%<input id="grayscale" type="range" min="0" max="100" value="0" /></label>
-              <label>Preto/branco <span id="thresholdValue">0</span><input id="threshold" type="range" min="0" max="255" value="0" /></label>
+              <label>Brilho <span id="brightnessValue">100</span>%
+                <input id="brightness" type="range" min="50" max="180" value="100" />
+              </label>
+              <label>Contraste <span id="contrastValue">100</span>%
+                <input id="contrast" type="range" min="50" max="220" value="100" />
+              </label>
+              <label>Saturação <span id="saturationValue">100</span>%
+                <input id="saturation" type="range" min="0" max="180" value="100" />
+              </label>
+              <label>Escala de cinza <span id="grayscaleValue">0</span>%
+                <input id="grayscale" type="range" min="0" max="100" value="0" />
+              </label>
+              <label>Preto/branco <span id="thresholdValue">0</span>
+                <input id="threshold" type="range" min="0" max="255" value="0" />
+              </label>
             </details>
 
             <details>
@@ -277,64 +377,100 @@
               <label class="checkline"><input id="includeFooterInfo" type="checkbox" checked /> Rodapé com classificação</label>
               <label class="checkline"><input id="embedOcrText" type="checkbox" checked /> PDF pesquisável quando houver OCR</label>
               <label>Idioma OCR
-                <select id="ocrLang"><option value="por" selected>Português</option><option value="eng">Inglês</option><option value="por+eng">Português + Inglês</option></select>
+                <select id="ocrLang">
+                  <option value="por" selected>Português</option>
+                  <option value="eng">Inglês</option>
+                  <option value="por+eng">Português + Inglês</option>
+                </select>
               </label>
               <div class="button-grid">
-                <button id="ocrPageBtn" class="small">OCR página</button><button id="ocrAttachmentBtn" class="small">OCR anexo</button><button id="ocrAllBtn" class="small">OCR tudo</button>
+                <button id="ocrPageBtn" class="small">OCR página</button>
+                <button id="ocrAttachmentBtn" class="small">OCR anexo</button>
+                <button id="ocrAllBtn" class="small">OCR tudo</button>
               </div>
             </details>
-            <div class="apply-panel">
+        </div>
+<div class="apply-panel">
               <strong>Aplicar padrão atual</strong>
               <p>Depois de ajustar uma página, aplique ao anexo, ao Doc ou a todos.</p>
               <div class="button-grid">
-                <button id="applyToAttachmentBtn" class="small">Ao anexo</button><button id="applyToDocBtn" class="small">Ao Doc</button><button id="applyToAllBtn" class="small">A todos</button>
+                <button id="applyToAttachmentBtn" class="small">Ao anexo</button>
+                <button id="applyToDocBtn" class="small">Ao Doc</button>
+                <button id="applyToAllBtn" class="small">A todos</button>
               </div>
             </div>
+
           </aside>
         </div>
 
-        <div class="footer-nav"><button class="ghost prev" data-prev="1">Voltar</button><button class="primary next" data-next="3">Avançar</button></div>
+        <div class="footer-nav">
+          <button class="ghost prev" data-prev="1">Voltar</button>
+          <button class="primary next" data-next="3">Avançar</button>
+        </div>
       </section>
 
       <section id="step3" class="step-panel">
         <div class="grid export-grid">
           <aside class="card">
-            <div class="card-title"><h2>Prévia por Doc</h2><p>Confira Docs e miniaturas antes de gerar.</p></div>
+            <div class="card-title">
+              <h2>Ordem final</h2>
+              <p>Confira a sequência dos Docs antes de exportar.</p>
+            </div>
             <div id="exportDocList" class="doc-tabs"></div>
             <div id="exportThumbs" class="export-thumbs"></div>
+
             <hr />
+
             <label>Saída
-              <select id="exportMode"><option value="single" selected>PDF único</option><option value="zip">ZIP com um PDF por Doc</option></select>
+              <select id="exportMode">
+                <option value="single" selected>PDF único</option>
+                <option value="zip">ZIP com um PDF por Doc</option>
+              </select>
             </label>
+
             <label>Nome do arquivo geral, opcional
               <input id="outputName" type="text" placeholder="Se vazio, usa Doc e título quando for individual" />
             </label>
             <input id="previewPdfBtn" type="hidden" />
-            <p class="hint">A pré-visualização é gerada automaticamente ao entrar nesta etapa. O card fica só para organizar e conferir os Docs.</p>
+            <p class="hint">A pré-visualização é gerada automaticamente ao entrar nesta etapa. O card fica só para organizar, conferir e ajustar os elementos finais.</p>
           </aside>
 
           <section class="card preview-export">
             <div class="card-title horizontal">
-              <div><h2>Pré-visualização final</h2><p>Somente conferência. Para editar, volte para a etapa 2.</p></div>
-              <button id="downloadPreviewBtn" class="ghost" disabled>Baixar arquivo gerado</button>
+              <div>
+                <h2>Pré-visualização final</h2>
+                <p>Somente conferência. Para editar, volte para a etapa 2.</p>
+              </div>
+              <button id="downloadPreviewBtn" class="ghost" disabled>Baixar prévia gerada</button>
             </div>
-            <iframe id="pdfFrame" title="Pré-visualização do PDF"></iframe>
+            <iframe id="pdfFrame" title="Pré-visualização do PDF"></iframe><a id="openPreviewLink" class="preview-link ghost" href="#" target="_blank" rel="noopener" hidden>Abrir prévia em nova aba</a>
             <p id="previewEmpty" class="empty">Pré-visualização automática ao entrar nesta etapa.</p>
           </section>
         </div>
 
         <div class="footer-nav">
           <button class="ghost prev" data-prev="2">Voltar</button>
-          <div class="bottom-actions"><button id="downloadPdfBtn" class="primary">Baixar documentos</button><button id="newProjectBtn" class="ghost danger">Novo projeto</button></div>
+          <div class="bottom-actions">
+            <button id="downloadPdfBtn" class="primary">Baixar documentos</button>
+            <button id="newProjectBtn" class="ghost danger">Novo projeto</button>
+          </div>
         </div>
       </section>
     </main>
 
+
     <div id="confirmModal" class="modal-backdrop" hidden aria-hidden="true">
       <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
         <div class="confirm-icon">!</div>
-        <div><p class="eyebrow">Confirmar novo projeto</p><h2 id="confirmTitle">Apagar tudo e iniciar novamente?</h2><p>Todos os Docs, anexos, páginas, ajustes, OCR e pré-visualização atual serão removidos. A operação não pode ser desfeita.</p></div>
-        <div class="confirm-actions"><button id="cancelNewProjectBtn" class="ghost" type="button">Cancelar</button><button id="confirmNewProjectBtn" class="primary danger-fill" type="button">Apagar e voltar à etapa 1</button></div>
+        <div>
+          <p class="eyebrow">Confirmar novo projeto</p>
+          <h2 id="confirmTitle">Apagar tudo e iniciar novamente?</h2>
+          <p>Todos os Docs, anexos, páginas, ajustes, OCR e pré-visualização atual serão removidos. A operação não pode ser desfeita.</p>
+        </div>
+        <div class="confirm-actions">
+          <button id="cancelNewProjectBtn" class="ghost" type="button">Cancelar</button>
+          <button id="confirmNewProjectBtn" class="primary danger-fill" type="button">Apagar e voltar à etapa 1</button>
+        </div>
       </div>
     </div>
 
