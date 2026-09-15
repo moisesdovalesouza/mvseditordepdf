@@ -124,3 +124,14 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Adicionada opção "Abrir câmera" com `capture="environment"` para fotografar documentos no celular.
 - Modo claro/escuro/sistema foi reforçado com `data-theme`, `data-resolved-theme`, classes no body e atualização de meta theme-color.
 - Responsividade revisada para desktop, tablets e celulares.
+
+
+## v26
+
+- Padronização visual de ícones internos, substituindo emojis/glyphs soltos por badges textuais consistentes.
+- Revisão do sistema de espaçamento com tokens de grid: gaps, paddings, altura de controles e margens.
+- Botões, selects, inputs, cards e notificações receberam proporções unificadas.
+- Botão de câmera refeito como label nativo associado ao input `capture="environment"`, mais confiável em celulares.
+- O input de câmera deixou de usar `hidden`, pois alguns navegadores móveis bloqueiam abertura de câmera quando o campo está invisível de forma rígida.
+- Ajuste responsivo revisado para desktop, tablet e celular.
+- Botão de montagem A4 padronizado dentro da grade de ações.

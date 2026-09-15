@@ -47,7 +47,7 @@
     <main>
       <section id="step1" class="step-panel active">
         <div class="step-section-heading">
-          <span class="card-icon">1</span>
+          <span class="card-icon icon-step">01</span>
           <div>
             <h2>Arquivos e Docs</h2>
             <p>Primeiro entram os arquivos; depois o projeto é organizado em Docs, anexos e faces.</p>
@@ -58,7 +58,7 @@
           <section class="card upload-card">
             <div class="card-title horizontal">
               <div>
-                <span class="card-icon">⇧</span>
+                <span class="card-icon icon-upload">UP</span>
                 <h2>Enviar arquivos</h2>
                 <p>PDFs e imagens entram no Doc selecionado e podem virar anexos ou faces na mesma folha.</p>
               </div>
@@ -114,20 +114,20 @@
               </label>
 
               <div class="camera-card">
-                <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
-                <button id="openCameraBtn" type="button" class="camera-btn">
-                  <span class="camera-icon">⌁</span>
-                  <strong>Abrir câmera</strong>
-                  <small>Fotografar documento agora</small>
-                </button>
-                <p class="hint">No celular, abre a câmera traseira quando o navegador permite. No computador, abre seleção de imagem.</p>
+                <input id="cameraInput" class="camera-input" type="file" accept="image/*" capture="environment" />
+                <label id="openCameraBtn" for="cameraInput" class="camera-btn" role="button" tabindex="0">
+                  <span class="camera-icon" aria-hidden="true">CAM</span>
+                  <strong>Fotografar documento</strong>
+                  <small>Usar câmera do celular</small>
+                </label>
+                <p class="hint">No celular, abre a câmera traseira quando o navegador permite. No computador, permite selecionar uma imagem.</p>
               </div>
             </div>
 
             <div class="section-actions smart-actions">
               <button id="removeAttachmentBtn" class="small danger" hidden>Remover anexo</button>
-              <button id="mergeSmallDocsBtn" class="small primary">Aplicar montagem</button>
-              <label class="sort-select-label">Organizar
+              <button id="mergeSmallDocsBtn" class="small primary action-fit">Aplicar montagem A4</button>
+              <label class="sort-select-label">Organizar anexos
                 <select id="attachmentSortSelect">
                   <option value="">Escolha a organização</option>
                   <option value="importance">Por importância jurídica</option>
@@ -144,7 +144,7 @@
           <section class="card docs-card">
             <div class="card-title horizontal">
               <div>
-                <span class="card-icon">📄</span>
+                <span class="card-icon icon-docs">DOC</span>
                 <h2>Docs do projeto</h2>
                 <p>Índice recolhível: edite número, título, classificação e anexos dentro do próprio Doc.</p>
               </div>
@@ -176,7 +176,7 @@
             <div class="left-visual-stack">
             <details class="card collapsible-card visual-model-card">
               <summary>
-                <span class="card-icon">▣</span>
+                <span class="card-icon icon-visual">PDF</span>
                 <span>
                   <strong>Capa, timbre, visual e fontes</strong>
                   <small>Modelo visual, capa, timbre e fontes usadas no PDF.</small>
@@ -290,7 +290,7 @@
           <aside class="controls-panel">
             <details class="card collapsible-card">
               <summary>
-                <span class="card-icon">◫</span>
+                <span class="card-icon icon-paper">A4</span>
                 <span>
                   <strong>Papel e área útil</strong>
                   <small>Tamanho, orientação e margem do conteúdo.</small>
@@ -320,7 +320,7 @@
 
             <details class="card collapsible-card" open>
               <summary>
-                <span class="card-icon">⌖</span>
+                <span class="card-icon icon-crop">BX</span>
                 <span>
                   <strong>Bordas e perspectiva</strong>
                   <small>Correção individual da página ou face selecionada.</small>
@@ -347,7 +347,7 @@
 
             <details class="card collapsible-card">
               <summary>
-                <span class="card-icon">◐</span>
+                <span class="card-icon icon-filter">FX</span>
                 <span>
                   <strong>Aparência e filtros</strong>
                   <small>Brilho, contraste, scanner e preto/branco.</small>
@@ -379,7 +379,7 @@
 
             <details class="card collapsible-card">
               <summary>
-                <span class="card-icon">OCR</span>
+                <span class="card-icon icon-ocr">OCR</span>
                 <span>
                   <strong>Cabeçalho, rodapé e OCR</strong>
                   <small>Textos finais, numeração e PDF pesquisável.</small>
@@ -407,7 +407,7 @@
 
             <details class="card collapsible-card apply-panel-card">
               <summary>
-                <span class="card-icon">↻</span>
+                <span class="card-icon icon-apply">OK</span>
                 <span>
                   <strong>Aplicar padrão atual</strong>
                   <small>Copia apenas ajustes comuns. Perspectiva continua individual.</small>

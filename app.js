@@ -1360,9 +1360,19 @@ function bind(){
   els.scanType.onchange=renderScanHint;
   if(els.uploadMode) els.uploadMode.onchange=renderScanHint;
   els.attachmentViewMode.onchange=renderAttachments;
-  els.fileInput.onchange=e=>handleFiles(e.target.files);
-  if(els.openCameraBtn && els.cameraInput) els.openCameraBtn.onclick=()=>els.cameraInput.click();
-  if(els.cameraInput) els.cameraInput.onchange=e=>handleFiles(e.target.files);
+  els.fileInput.onchange=async e=>{
+    await handleFiles(e.target.files);
+    e.target.value="";
+  };
+  if(els.openCameraBtn && els.cameraInput) {
+    els.openCameraBtn.addEventListener("keydown", e=>{
+      if(e.key==="Enter" || e.key===" "){ e.preventDefault(); els.cameraInput.click(); }
+    });
+  }
+  if(els.cameraInput) els.cameraInput.onchange=async e=>{
+    await handleFiles(e.target.files);
+    e.target.value="";
+  };
   ["dragenter","dragover"].forEach(evt=>els.dropzone.addEventListener(evt,e=>{e.preventDefault();els.dropzone.classList.add("dragover")}));
   ["dragleave","drop"].forEach(evt=>els.dropzone.addEventListener(evt,e=>{e.preventDefault();els.dropzone.classList.remove("dragover")}));
   els.dropzone.addEventListener("drop",e=>handleFiles(e.dataTransfer.files));
