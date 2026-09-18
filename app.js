@@ -90,6 +90,22 @@ const els = {
   status:$("status")
 };
 
+// quality-choice-delegation-v34
+document.addEventListener("click",event=>{
+  const btn=event.target.closest?.(".quality-option");
+  if(!btn)return;
+  event.preventDefault();
+  event.stopPropagation();
+  const choice=btn.dataset.quality;
+  if(!QUALITY_PRESETS[choice])return;
+  state.pdfQuality=choice;
+  updateQualityUi();
+  if(document.getElementById("step3")?.classList.contains("active")){
+    previewPdf().catch(()=>{});
+  }
+});
+
+
 const uid = () => crypto?.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random());
 const clamp = (n,min,max) => Math.max(min, Math.min(max,n));
 const mmToPt = mm => mm * 2.8346456693;
