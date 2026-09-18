@@ -160,3 +160,12 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Grid revisado em múltiplos de 4 px e componentes com cantos menos arredondados.
 - Cabeçalho, rodapés e controles deixaram de usar posicionamentos que podiam encobrir funções.
 - Menus, cards, ações e colunas ganharam `min-width: 0`, quebra responsiva e largura automática para evitar sobreposição.
+
+
+## v29 — 18/09/2026
+
+- Anexos de cada Doc passaram a ter recolhimento independente do restante das informações do Doc.
+- Descrições longas e óbvias foram removidas da interface; explicações úteis migraram para botões contextuais `i`, disponíveis por hover ou clique.
+- Upload de capa e timbrado foi integrado às respectivas prévias, eliminando os campos de arquivo soltos e visualmente desconectados.
+- Etapa 1 ficou mais compacta para projetos com muitos Docs e anexos.
+- Mantidos grid, tema manual, upload unificado e revisão de responsividade da v28.
