@@ -77,7 +77,7 @@
           <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">Claro</button>
           <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="false">Escuro</button>
         </div>
-        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 29</button>
+        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 30</button>
         <button id="installBtn" class="ghost install-cta" hidden>Instalar app</button>
       </div>
     </header>
@@ -295,7 +295,6 @@
                 <p id="selectedPageInfo">Nenhuma página selecionada.</p>
               </div>
               <div class="section-actions">
-                <button id="autoCornersBtn" class="small">Detectar bordas</button>
                 <button id="resetCornersBtn" class="small">Reset</button>
                 <button id="rotateLeftBtn" class="small">⟲ 90°</button>
                 <button id="rotateRightBtn" class="small">⟳ 90°</button>
@@ -363,9 +362,14 @@
                   </select>
                 </label>
                 <div class="two-col">
-                  <label>Papel
+                  <label>
+                    <span class="field-label-row">
+                      <span>Papel</span>
+                      <button class="info-tip" type="button" data-tip="Original do anexo preserva o tamanho real quando a origem é PDF. Em imagens, preserva a proporção original da fotografia sem forçar A4." aria-label="Ajuda sobre tamanho original">i</button>
+                    </span>
                     <select id="paperSize">
                       <option value="a4" selected>A4</option>
+                      <option value="original">Original do anexo</option>
                       <option value="letter">Carta</option>
                       <option value="legal">Ofício/Legal</option>
                     </select>
@@ -399,7 +403,11 @@
                                   </span>
               </summary>
               <div class="details-body">
-                <label class="checkline"><input id="perspectiveEnabled" type="checkbox" /> Corrigir perspectiva</label>
+                <div class="perspective-actions">
+                  <button id="autoCornersBtn" class="small primary" type="button">Detectar perspectiva</button>
+                  <button class="info-tip" type="button" data-tip="A detecção automática só é executada quando este botão é acionado. Depois, confira os quatro vértices e ajuste manualmente se necessário." aria-label="Ajuda sobre perspectiva automática">i</button>
+                </div>
+                <label class="checkline"><input id="perspectiveEnabled" type="checkbox" /> Aplicar correção pelos vértices</label>
                 <div class="two-col">
                   <label>Topo <span id="edgeTopValue">0</span>%
                     <input id="edgeTop" type="range" min="0" max="40" value="0" />
@@ -448,6 +456,38 @@
               </div>
             </details>
 
+            <details class="card collapsible-card pdf-quality-card">
+              <summary>
+                <span class="card-icon icon-quality">Q</span>
+                <span>
+                  <strong>Qualidade do PDF</strong>
+                </span>
+                <span id="qualitySummaryBadge" class="quality-summary-badge">Padrão</span>
+              </summary>
+              <div class="details-body">
+                <div class="quality-options" role="radiogroup" aria-label="Qualidade do PDF">
+                  <button class="quality-option" type="button" data-quality="compact">
+                    <strong>Compacto</strong><small>arquivo menor</small>
+                  </button>
+                  <button class="quality-option active" type="button" data-quality="standard">
+                    <strong>Padrão</strong><small>recomendado</small>
+                  </button>
+                  <button class="quality-option" type="button" data-quality="high">
+                    <strong>Alta</strong><small>mais nitidez</small>
+                  </button>
+                  <button class="quality-option" type="button" data-quality="maximum">
+                    <strong>Máxima</strong><small>mínima perda</small>
+                  </button>
+                </div>
+                <div class="quality-meter" aria-hidden="true"><span id="qualityMeterFill"></span></div>
+                <div class="quality-estimate">
+                  <span>Tamanho estimado</span>
+                  <strong id="pdfSizeEstimate">Sem páginas</strong>
+                  <button class="info-tip" type="button" data-tip="É uma estimativa baseada na quantidade de páginas, resolução atual, compressão escolhida, capa e timbrado. O tamanho real pode variar conforme o conteúdo." aria-label="Ajuda sobre estimativa do PDF">i</button>
+                </div>
+              </div>
+            </details>
+
             <details class="card collapsible-card">
               <summary>
                 <span class="card-icon icon-ocr">OCR</span>
@@ -460,7 +500,11 @@
                 <label class="checkline"><input id="includePageNumbers" type="checkbox" checked /> Numeração X de X</label>
                 <label class="checkline"><input id="includeFooterInfo" type="checkbox" checked /> Rodapé com classificação</label>
                 <label class="checkline"><input id="embedOcrText" type="checkbox" checked /> PDF pesquisável quando houver OCR</label>
-                <label>Idioma OCR
+                <label>
+                  <span class="field-label-row">
+                    <span>Idioma OCR</span>
+                    <button class="info-tip" type="button" data-tip="O OCR usa uma imagem preparada em alta definição, com contraste automático. Se a confiança ficar baixa, o aplicativo tenta uma segunda leitura em preto e branco." aria-label="Ajuda sobre OCR aprimorado">i</button>
+                  </span>
                   <select id="ocrLang">
                     <option value="por" selected>Português</option>
                     <option value="eng">Inglês</option>
@@ -594,7 +638,7 @@
             <p class="eyebrow">Versão e informações</p>
             <div class="about-title-line">
               <h2 id="aboutTitle">MVS Editor de PDF</h2>
-              <span class="about-version">v29</span>
+              <span class="about-version">v30</span>
             </div>
           </div>
         </div>
@@ -606,18 +650,19 @@
         </div>
 
         <section class="release-card">
-          <div class="release-title"><strong>Novidades da v29</strong><span>18/09/2026</span></div>
+          <div class="release-title"><strong>Novidades da v30</strong><span>18/09/2026</span></div>
           <ul class="release-list">
-            <li>Anexos de cada Doc agora podem ser recolhidos separadamente.</li>
-            <li>Descrições longas foram substituídas por ajuda contextual em ícones “i”.</li>
-            <li>Upload de capa e timbrado foi integrado às próprias prévias visuais.</li>
-            <li>Etapa 1 ficou mais compacta para projetos com muitos Docs.</li>
+            <li>Tamanho de papel “Original do anexo”, preservando dimensão/proporção da origem.</li>
+            <li>Controle de qualidade: Compacto, Padrão, Alta e Máxima, com previsão de tamanho.</li>
+            <li>OCR aprimorado com pré-processamento e segunda leitura automática quando a confiança é baixa.</li>
+            <li>Detecção de perspectiva mais robusta e executada somente ao clicar.</li>
           </ul>
         </section>
 
         <details class="history-card">
           <summary>Histórico de atualizações</summary>
           <div class="history-list">
+            <article><strong>v29 · 18/09/2026</strong><p>Docs com anexos recolhíveis, ajuda contextual e capa/timbrado integrados às prévias.</p></article>
             <article><strong>v28 · 18/09/2026</strong><p>Tema manual independente, upload unificado, grid revisado e painel de versão/histórico.</p></article>
             <article><strong>v27 · 18/09/2026</strong><p>Desempenho, novo projeto, capa/timbrado próprios, papel individual e composição de até 6 páginas.</p></article>
             <article><strong>v26 · 14/09/2026</strong><p>Padronização de grid, ícones, câmera e controles.</p></article>
