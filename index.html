@@ -14,6 +14,50 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="MVS PDF" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <script>
+  (function(){
+    const KEY="mvs-pdf-theme";
+    const root=document.documentElement;
+    const media=window.matchMedia("(prefers-color-scheme: dark)");
+    function setButtons(choice){
+      document.querySelectorAll("[data-theme-choice]").forEach(btn=>{
+        const active=btn.dataset.themeChoice===choice;
+        btn.classList.toggle("active",active);
+        btn.setAttribute("aria-pressed",String(active));
+      });
+    }
+    function apply(choice,persist=true){
+      choice=["system","light","dark"].includes(choice)?choice:"system";
+      root.classList.remove("force-light","force-dark");
+      const resolved=choice==="system"?(media.matches?"dark":"light"):choice;
+      if(choice==="light") root.classList.add("force-light");
+      if(choice==="dark") root.classList.add("force-dark");
+      root.dataset.theme=choice;
+      root.dataset.resolvedTheme=resolved;
+      root.style.colorScheme=resolved;
+      if(persist){try{localStorage.setItem(KEY,choice)}catch(_){}}
+      setButtons(choice);
+      document.querySelectorAll('meta[name="theme-color"]').forEach(meta=>{
+        meta.setAttribute("content",resolved==="dark"?"#151c29":"#f7f3e9");
+      });
+      return {choice,resolved};
+    }
+    let saved="system";
+    try{saved=localStorage.getItem(KEY)||"system"}catch(_){}
+    apply(saved,false);
+    window.MVSTheme={apply,getChoice:()=>root.dataset.theme||"system"};
+    document.addEventListener("DOMContentLoaded",()=>setButtons(root.dataset.theme||"system"));
+    document.addEventListener("click",event=>{
+      const btn=event.target.closest?.("[data-theme-choice]");
+      if(!btn)return;
+      event.preventDefault();
+      apply(btn.dataset.themeChoice,true);
+    });
+    media.addEventListener?.("change",()=>{
+      if((root.dataset.theme||"system")==="system")apply("system",false);
+    });
+  })();
+  </script>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -25,7 +69,6 @@
         <div>
           <p class="eyebrow">Processamento local</p>
           <h1>MVS Editor de PDF</h1>
-          <p class="subtitle">Projeto, Docs, anexos e páginas em fluxo jurídico.</p>
         </div>
       </div>
       <div class="header-actions">
@@ -34,15 +77,15 @@
           <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">Claro</button>
           <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="false">Escuro</button>
         </div>
-        <button id="aboutBtn" class="ghost about-cta" type="button">Sobre</button>
+        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 28</button>
         <button id="installBtn" class="ghost install-cta" hidden>Instalar app</button>
       </div>
     </header>
 
     <nav class="steps" aria-label="Etapas">
-      <button class="step active" data-step="1"><span>1</span><strong>Arquivos e Docs</strong><small>Enviar, agrupar e organizar</small></button>
-      <button class="step" data-step="2"><span>2</span><strong>Edição, capa e montagem</strong><small>Perspectiva, visual, OCR e A4</small></button>
-      <button class="step" data-step="3"><span>3</span><strong>Conferência e envio</strong><small>Ordem final, PDF ou ZIP</small></button>
+      <button class="step active" data-step="1"><span>1</span><strong>Arquivos e Docs</strong></button>
+      <button class="step" data-step="2"><span>2</span><strong>Edição, capa e montagem</strong></button>
+      <button class="step" data-step="3"><span>3</span><strong>Conferência e envio</strong></button>
     </nav>
 
     <main>
@@ -51,8 +94,7 @@
           <span class="card-icon icon-step">01</span>
           <div>
             <h2>Arquivos e Docs</h2>
-            <p>Primeiro entram os arquivos; depois o projeto é organizado em Docs, anexos e faces.</p>
-          </div>
+                      </div>
         </div>
 
         <div class="grid step1-split-grid">
@@ -61,8 +103,7 @@
               <div>
                 <span class="card-icon icon-upload">UP</span>
                 <h2>Enviar arquivos</h2>
-                <p>PDFs e imagens entram no Doc selecionado e podem virar anexos ou faces na mesma folha.</p>
-              </div>
+                              </div>
               <select id="attachmentViewMode" hidden aria-hidden="true">
                 <option value="mixed" selected>Lista com miniaturas</option>
               </select>
@@ -103,21 +144,12 @@
             </div>
 
             <div class="upload-entry-grid">
-              <label class="dropzone" id="dropzone">
-                <input id="fileInput" type="file" multiple accept="image/*,application/pdf" />
-                <span class="drop-title">Arraste PDFs ou fotografias aqui</span>
-                <span class="drop-help">ou clique para selecionar do dispositivo</span>
-                <span class="drop-meta">PDF, JPG e PNG · processamento local</span>
-              </label>
-
-              <div class="camera-card">
-                <input id="cameraInput" class="camera-input" type="file" accept="image/*" capture="environment" />
-                <label id="openCameraBtn" for="cameraInput" class="camera-btn" role="button" tabindex="0">
-                  <span class="camera-icon" aria-hidden="true">CAM</span>
-                  <span class="camera-copy"><strong>Fotografar documento</strong><small>Abrir câmera traseira</small></span>
-                </label>
-                <p class="hint">No celular, abre a câmera traseira quando o navegador permite. No computador, permite selecionar uma imagem.</p>
+              <div class="dropzone upload-launcher" id="dropzone" role="button" tabindex="0" aria-label="Adicionar arquivos ou fotografar documento">
+                <span class="drop-title">Arraste arquivos aqui ou clique para adicionar</span>
+                <span class="drop-meta">PDF, JPG e PNG</span>
               </div>
+              <input id="fileInput" class="visually-hidden-file" type="file" multiple accept="image/*,application/pdf" />
+              <input id="cameraInput" class="visually-hidden-file" type="file" accept="image/*" capture="environment" />
             </div>
 
             <div class="section-actions smart-actions">
@@ -143,8 +175,7 @@
               <div>
                 <span class="card-icon icon-docs">DOC</span>
                 <h2>Docs do projeto</h2>
-                <p>Índice recolhível: edite número, título, classificação e anexos dentro do próprio Doc.</p>
-              </div>
+                              </div>
               <button id="addDocBtn" class="ghost">+ Novo Doc</button>
             </div>
             <button id="renumberDocsBtn" class="ghost small">Renumerar Docs</button>
@@ -160,8 +191,7 @@
           <aside class="card sidebar">
             <div class="card-title">
               <h2>Estrutura</h2>
-              <p>Projeto › Docs › Anexos. Escolha o ponto de edição.</p>
-            </div>
+                          </div>
             <label>Doc
               <select id="editDocSelect"></select>
             </label>
@@ -176,8 +206,7 @@
                 <span class="card-icon icon-visual">PDF</span>
                 <span>
                   <strong>Capa, timbre, visual e fontes</strong>
-                  <small>Modelo visual, capa, timbre e fontes usadas no PDF.</small>
-                </span>
+                                  </span>
               </summary>
               <div class="details-body">
                 <label class="checkline"><input id="includeCover" type="checkbox" /> Incluir capa</label>
@@ -313,8 +342,7 @@
                 <span class="card-icon icon-paper">A4</span>
                 <span>
                   <strong>Papel e área útil</strong>
-                  <small>Configuração individual por página ou por anexo, sem distorção.</small>
-                </span>
+                                  </span>
               </summary>
               <div class="details-body">
                 <label>Aplicar configuração de papel em
@@ -354,8 +382,7 @@
                 <span class="card-icon icon-crop">BX</span>
                 <span>
                   <strong>Bordas e perspectiva</strong>
-                  <small>Correção individual da página ou face selecionada.</small>
-                </span>
+                                  </span>
               </summary>
               <div class="details-body">
                 <label class="checkline"><input id="perspectiveEnabled" type="checkbox" /> Corrigir perspectiva</label>
@@ -381,8 +408,7 @@
                 <span class="card-icon icon-filter">FX</span>
                 <span>
                   <strong>Aparência e filtros</strong>
-                  <small>Brilho, contraste, scanner e preto/branco.</small>
-                </span>
+                                  </span>
               </summary>
               <div class="details-body">
                 <div class="button-grid">
@@ -413,8 +439,7 @@
                 <span class="card-icon icon-ocr">OCR</span>
                 <span>
                   <strong>Cabeçalho, rodapé e OCR</strong>
-                  <small>Textos finais, numeração e PDF pesquisável.</small>
-                </span>
+                                  </span>
               </summary>
               <div class="details-body">
                 <label class="checkline"><input id="includeHeader" type="checkbox" checked /> Cabeçalho com Doc, título e anexo</label>
@@ -441,8 +466,7 @@
                 <span class="card-icon icon-apply">OK</span>
                 <span>
                   <strong>Aplicar padrão atual</strong>
-                  <small>Copia apenas ajustes comuns. Perspectiva continua individual.</small>
-                </span>
+                                  </span>
               </summary>
               <div class="details-body">
                 <p class="hint">Use depois de ajustar aparência, rotação ou margens. A posição dos vértices não será copiada.</p>
@@ -467,8 +491,7 @@
           <aside class="card">
             <div class="card-title">
               <h2>Ordem final</h2>
-              <p>Confira a sequência dos Docs antes de exportar.</p>
-            </div>
+                          </div>
             <div id="exportDocList" class="doc-tabs"></div>
             <div id="exportThumbs" class="export-thumbs"></div>
 
@@ -485,15 +508,13 @@
               <input id="outputName" type="text" placeholder="Se vazio, usa Doc e título quando for individual" />
             </label>
             <input id="previewPdfBtn" type="hidden" />
-            <p class="hint">A pré-visualização é gerada automaticamente ao entrar nesta etapa. O card fica só para organizar, conferir e ajustar os elementos finais.</p>
-          </aside>
+                      </aside>
 
           <section class="card preview-export">
             <div class="card-title horizontal">
               <div>
                 <h2>Pré-visualização final</h2>
-                <p>Somente conferência. Para editar, volte para a etapa 2.</p>
-              </div>
+                              </div>
               <button id="downloadPreviewBtn" class="ghost" disabled>Baixar prévia gerada</button>
             </div>
             <iframe id="pdfFrame" title="Pré-visualização do PDF"></iframe><a id="openPreviewLink" class="preview-link ghost" href="#" target="_blank" rel="noopener" hidden>Abrir prévia em nova aba</a>
@@ -520,26 +541,96 @@
 
 
 
+
+    <div id="uploadSourceModal" class="modal-backdrop" hidden aria-hidden="true">
+      <div class="confirm-dialog source-dialog" role="dialog" aria-modal="true" aria-labelledby="uploadSourceTitle">
+        <div class="modal-title-row">
+          <div class="confirm-icon">+</div>
+          <div>
+            <p class="eyebrow">Adicionar documento</p>
+            <h2 id="uploadSourceTitle">Como deseja adicionar?</h2>
+          </div>
+        </div>
+        <div class="source-choice-grid">
+          <button id="chooseFilesBtn" class="source-choice" type="button">
+            <span class="source-choice-icon">ARQ</span>
+            <strong>Escolher arquivos</strong>
+            <small>PDF, JPG ou PNG</small>
+          </button>
+          <button id="takePhotoBtn" class="source-choice" type="button">
+            <span class="source-choice-icon">CAM</span>
+            <strong>Tirar foto</strong>
+            <small>Usar câmera do dispositivo</small>
+          </button>
+        </div>
+        <div class="confirm-actions">
+          <button id="closeUploadSourceBtn" class="ghost" type="button">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
     <div id="aboutModal" class="modal-backdrop" hidden aria-hidden="true">
       <div class="confirm-dialog about-dialog" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
         <div class="about-head">
           <div class="confirm-icon about-icon">MVS</div>
           <div>
-            <p class="eyebrow">Sobre o aplicativo</p>
-            <h2 id="aboutTitle">MVS Editor de PDF</h2><small class="about-version">Versão 27</small>
-            <p>Ferramenta para organizar Docs, anexos e páginas, corrigir digitalizações, montar múltiplas faces, aplicar capa/timbrado, OCR e exportar documentos jurídicos em PDF.</p>
+            <p class="eyebrow">Versão e informações</p>
+            <div class="about-title-line">
+              <h2 id="aboutTitle">MVS Editor de PDF</h2>
+              <span class="about-version">v28</span>
+            </div>
           </div>
         </div>
-        <div class="about-grid">
-          <div><strong>Função</strong><p>Editor e montador de PDFs com processamento local no navegador.</p></div>
-          <div><strong>Criador</strong><p>Moisés do Vale Souza</p></div>
+
+        <div class="about-meta-grid">
+          <div><span>Atualizado em</span><strong>18/09/2026</strong></div>
+          <div><span>Criador</span><strong>Moisés do Vale Souza</strong></div>
+          <div><span>Processamento</span><strong>Local no navegador</strong></div>
         </div>
+
+        <section class="release-card">
+          <div class="release-title"><strong>Novidades da v28</strong><span>18/09/2026</span></div>
+          <ul class="release-list">
+            <li>Modo claro, escuro e sistema com alternância manual independente.</li>
+            <li>Upload unificado: ao clicar na área de envio, escolha arquivos ou câmera.</li>
+            <li>Grade, espaçamentos e responsividade revisados para evitar sobreposições.</li>
+            <li>Interface mais enxuta, com remoção de descrições óbvias.</li>
+            <li>Vértices dos componentes menos arredondados e visual mais sóbrio.</li>
+          </ul>
+        </section>
+
+        <details class="history-card">
+          <summary>Histórico de atualizações</summary>
+          <div class="history-list">
+            <article><strong>v27 · 18/09/2026</strong><p>Desempenho, novo projeto, capa/timbrado próprios, papel individual e composição de até 6 páginas.</p></article>
+            <article><strong>v26 · 14/09/2026</strong><p>Padronização de grid, ícones, câmera e controles.</p></article>
+            <article><strong>v25 · 14/09/2026</strong><p>Responsividade geral e primeira integração de câmera.</p></article>
+            <article><strong>v24 · 14/09/2026</strong><p>Reorganização das etapas e dos cards de configuração.</p></article>
+            <article><strong>v23</strong><p>Índice recolhível de Docs, lupa de precisão e revisão de bordas.</p></article>
+            <article><strong>v22</strong><p>Múltiplas faces por folha e perspectiva individual por página.</p></article>
+          </div>
+        </details>
+
+        <div class="creator-card">
+          <div class="creator-copy">
+            <strong>Moisés do Vale Souza</strong>
+            <span>Advogado · criador do MVS Editor de PDF</span>
+          </div>
+          <div class="pix-row">
+            <span>Chave Pix / e-mail</span>
+            <code id="pixKey">moisesdovalesouza@gmail.com</code>
+            <button id="copyPixBtn" class="small ghost" type="button">Copiar Pix</button>
+          </div>
+        </div>
+
         <div class="social-links" aria-label="Redes sociais do criador">
           <a href="https://instagram.com/moisesdovalesouza" target="_blank" rel="noopener">Instagram · @moisesdovalesouza</a>
           <a href="https://www.threads.net/@moisesdovalesouza" target="_blank" rel="noopener">Threads · @moisesdovalesouza</a>
           <a href="https://github.com/moisesdovalesouza" target="_blank" rel="noopener">GitHub · @moisesdovalesouza</a>
           <a href="https://x.com/moisesdovalesou" target="_blank" rel="noopener">X · @moisesdovalesou</a>
+          <a href="mailto:moisesdovalesouza@gmail.com">E-mail · moisesdovalesouza@gmail.com</a>
         </div>
+
         <div class="confirm-actions"><button id="closeAboutBtn" class="primary" type="button">Fechar</button></div>
       </div>
     </div>
