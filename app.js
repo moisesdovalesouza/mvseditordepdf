@@ -84,7 +84,7 @@ const els = {
   scannerPresetBtn:$("scannerPresetBtn"), cleanPresetBtn:$("cleanPresetBtn"), resetFilterBtn:$("resetFilterBtn"),
   includeHeader:$("includeHeader"), includePageNumbers:$("includePageNumbers"), includeFooterInfo:$("includeFooterInfo"), embedOcrText:$("embedOcrText"), ocrLang:$("ocrLang"),
   ocrPageBtn:$("ocrPageBtn"), ocrAttachmentBtn:$("ocrAttachmentBtn"), ocrAllBtn:$("ocrAllBtn"),
-  applyToAttachmentBtn:$("applyToAttachmentBtn"), applyToDocBtn:$("applyToDocBtn"), applyToAllBtn:$("applyToAllBtn"), qualitySummaryBadge:$("qualitySummaryBadge"), qualityMeterFill:$("qualityMeterFill"), pdfSizeEstimate:$("pdfSizeEstimate"),
+  applyToAttachmentBtn:$("applyToAttachmentBtn"), applyToDocBtn:$("applyToDocBtn"), applyToAllBtn:$("applyToAllBtn"), qualitySummaryBadge:$("qualitySummaryBadge"), qualityMeterFill:$("qualityMeterFill"), pdfSizeEstimate:$("pdfSizeEstimate"), preservePdfNative:$("preservePdfNative"),
   exportDocList:$("exportDocList"), exportThumbs:$("exportThumbs"), exportMode:$("exportMode"), outputName:$("outputName"),
   previewPdfBtn:$("previewPdfBtn"), downloadPdfBtn:$("downloadPdfBtn"), downloadPreviewBtn:$("downloadPreviewBtn"), pdfFrame:$("pdfFrame"), previewEmpty:$("previewEmpty"), openPreviewLink:$("openPreviewLink"),
   status:$("status")
@@ -901,14 +901,26 @@ function classificationFromScanType(file){
 }
 
 async function importPdf(file,att){
-  const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
-  for(let i=1;i<=pdf.numPages;i++){
-    setStatus(`Carregando ${file.name}, página ${i}/${pdf.numPages}...`);
-    const page=await pdf.getPage(i),originalView=page.getViewport({scale:1}),view=page.getViewport({scale:1.30});
-    const c=document.createElement("canvas");c.width=Math.floor(view.width);c.height=Math.floor(view.height);
-    await page.render({canvasContext:c.getContext("2d",{willReadFrequently:true}),viewport:view}).promise;
-    const adjust=defaultAdjust();adjust.originalPaper={width:originalView.width,height:originalView.height,kind:"pdf"};
-    att.pages.push({id:uid(),sourceCanvas:c,adjust,ocrText:"",ocrWords:[],ocrConfidence:null,thumbCache:null,selectedForSheet:false});
+  const bytes=new Uint8Array(await file.arrayBuffer());
+  const pdf=await pdfjsLib.getDocument({data:bytes}).promise;
+  const pageCount=pdf.numPages;
+  try{
+    for(let i=1;i<=pageCount;i++){
+      setStatus(`Carregando ${file.name}, página ${i}/${pageCount}...`);
+      const page=await pdf.getPage(i), originalView=page.getViewport({scale:1}), view=page.getViewport({scale:1.30});
+      const c=document.createElement("canvas"); c.width=Math.floor(view.width); c.height=Math.floor(view.height);
+      await page.render({canvasContext:c.getContext("2d",{willReadFrequently:true}),viewport:view}).promise;
+      const adjust=defaultAdjust();
+      adjust.originalPaper={width:originalView.width,height:originalView.height,kind:"pdf"};
+      att.pages.push({
+        id:uid(), sourceCanvas:c, adjust, ocrText:"", ocrWords:[], ocrConfidence:null,
+        thumbCache:null, selectedForSheet:false,
+        sourceKind:"pdf", sourcePdfFile:file, sourcePdfPageIndex:i-1, sourcePdfPageCount:pageCount
+      });
+      try{page.cleanup?.();}catch(_){}
+    }
+  }finally{
+    try{await pdf.destroy?.();}catch(_){}
   }
 }
 
@@ -917,7 +929,7 @@ async function importImage(file,att){
   const max=1800,scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement("canvas");c.width=Math.round(img.naturalWidth*scale);c.height=Math.round(img.naturalHeight*scale);
   const ctx=c.getContext("2d",{willReadFrequently:true});ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);
   const adjust=defaultAdjust(),baseMax=841.89,physicalScale=baseMax/Math.max(img.naturalWidth,img.naturalHeight);adjust.originalPaper={width:img.naturalWidth*physicalScale,height:img.naturalHeight*physicalScale,kind:"image"};
-  att.pages.push({id:uid(),sourceCanvas:c,adjust,ocrText:"",ocrWords:[],ocrConfidence:null,thumbCache:null,selectedForSheet:false});
+  att.pages.push({id:uid(),sourceCanvas:c,adjust,ocrText:"",ocrWords:[],ocrConfidence:null,thumbCache:null,selectedForSheet:false,sourceKind:"image"});
 }
 
 function mergeFirstTwoToA4(){
@@ -1040,12 +1052,32 @@ function prepareCanvasForQuality(canvas){const preset=qualityPreset();if(!preset
 async function embedCanvasForQuality(pdf,canvas){const preset=qualityPreset(),prepared=prepareCanvasForQuality(canvas);if(preset.format==="png")return await pdf.embedPng(await (await canvasBlob(prepared,"image/png")).arrayBuffer());return await pdf.embedJpg(await (await canvasBlob(prepared,"image/jpeg",preset.jpegQuality)).arrayBuffer());}
 function estimateItemPixels(item){const preset=qualityPreset();let w,h;if(item.pages.length>1){w=1240;h=1754;}else{const c=item.pages[0]?.sourceCanvas;if(!c)return 0;w=c.width;h=c.height;}if(preset.maxDim&&Math.max(w,h)>preset.maxDim){const sc=preset.maxDim/Math.max(w,h);w*=sc;h*=sc;}return Math.max(1,w*h);}
 function formatBytes(n){if(!Number.isFinite(n)||n<=0)return "Sem páginas";if(n<1024*1024)return `${Math.max(1,Math.round(n/1024))} KB`;return `${(n/(1024*1024)).toFixed(n<10*1024*1024?1:0).replace(".",",")} MB`;}
-function estimatePdfBytes(){let pixels=0,sheets=0,covers=0;for(const d of state.docs){if(els.includeCover?.checked)covers++;for(const a of d.attachments){for(const item of getAttachmentExportItems(a)){pixels+=estimateItemPixels(item);sheets++;}}}if(!sheets&&!covers)return null;const preset=qualityPreset();let bytes=pixels*preset.estimateBpp+sheets*16000+covers*180000;if(els.includeLetterhead?.checked)bytes+=sheets*45000;if(els.embedOcrText?.checked)bytes+=sheets*5000;return {low:bytes*.72,high:bytes*1.35,mid:bytes};}
-function updateQualityUi(){const preset=qualityPreset();document.querySelectorAll(".quality-option").forEach(btn=>{const active=btn.dataset.quality===state.pdfQuality;btn.classList.toggle("active",active);btn.setAttribute("aria-pressed",String(active));});if(els.qualitySummaryBadge)els.qualitySummaryBadge.textContent=preset.label;if(els.qualityMeterFill)els.qualityMeterFill.style.width=preset.meter+"%";const estimate=estimatePdfBytes();if(els.pdfSizeEstimate)els.pdfSizeEstimate.textContent=estimate?`≈ ${formatBytes(estimate.low)}–${formatBytes(estimate.high)}`:"Sem páginas";}
-
-async function readFileBytes(file){
-  if(!file) return null;
-  return new Uint8Array(await file.arrayBuffer());
+function estimatePdfBytes(){
+  let bytes=0,sheets=0,covers=0;
+  const preset=qualityPreset();
+  for(const d of state.docs){
+    if(els.includeCover?.checked)covers++;
+    for(const a of d.attachments){
+      for(const item of getAttachmentExportItems(a)){
+        sheets++;
+        for(const p of item.pages){
+          if(canPreservePdfPage(p)){
+            bytes+=nativePageApproxBytes(p)*.92;
+          }else{
+            const c=p.sourceCanvas;if(!c)continue;
+            let w=c.width,h=c.height;
+            if(preset.maxDim && Math.max(w,h)>preset.maxDim){const sc=preset.maxDim/Math.max(w,h);w*=sc;h*=sc;}
+            bytes+=Math.max(1,w*h)*preset.estimateBpp;
+          }
+        }
+      }
+    }
+  }
+  if(!sheets&&!covers)return null;
+  bytes+=sheets*16000+covers*180000;
+  if(els.includeLetterhead?.checked)bytes+=sheets*45000;
+  if(els.embedOcrText?.checked)bytes+=sheets*5000;
+  return {low:bytes*.70,high:bytes*1.38,mid:bytes};
 }
 
 async function backgroundFileToData(file){
@@ -1110,6 +1142,163 @@ function orientCanvasForBox(canvas, paperW, paperH){
   return rotatedScale > currentScale * 1.08 ? rotateCanvas(canvas,90) : canvas;
 }
 
+
+function hasPixelPdfAdjustments(p){
+  const a=p?.adjust||defaultAdjust();
+  return !!a.perspective ||
+    Number(a.brightness??100)!==100 ||
+    Number(a.contrast??100)!==100 ||
+    Number(a.saturation??100)!==100 ||
+    Number(a.grayscale??0)!==0 ||
+    Number(a.threshold??0)!==0;
+}
+function canPreservePdfPage(p){
+  return !!(els.preservePdfNative?.checked !== false &&
+    p?.sourceKind==="pdf" &&
+    p?.sourcePdfFile &&
+    Number.isInteger(p?.sourcePdfPageIndex) &&
+    !hasPixelPdfAdjustments(p));
+}
+function rotatedVisualSize(width,height,rotation=0){
+  const n=((Number(rotation)||0)%360+360)%360;
+  return (n===90||n===270)?{width:height,height:width}:{width,height};
+}
+function nativePageApproxBytes(p){
+  const f=p?.sourcePdfFile, count=Math.max(1,Number(p?.sourcePdfPageCount)||1);
+  return f?.size ? f.size/count : 0;
+}
+async function getNativePdfBytes(p,ctx){
+  const file=p.sourcePdfFile;
+  if(ctx.bytesByFile.has(file))return ctx.bytesByFile.get(file);
+  const bytes=new Uint8Array(await file.arrayBuffer());
+  ctx.bytesByFile.set(file,bytes);
+  return bytes;
+}
+async function getNativeEmbeddedPage(pdf,p,ctx){
+  if(ctx.embeddedByPage.has(p.id))return ctx.embeddedByPage.get(p.id);
+  const bytes=await getNativePdfBytes(p,ctx);
+  const [embedded]=await pdf.embedPdf(bytes,[p.sourcePdfPageIndex]);
+  ctx.embeddedByPage.set(p.id,embedded);
+  return embedded;
+}
+async function getNativeSourceDocument(p,ctx){
+  const file=p.sourcePdfFile;
+  if(ctx.sourceDocs.has(file))return ctx.sourceDocs.get(file);
+  const bytes=await getNativePdfBytes(p,ctx);
+  const doc=await PDFLib.PDFDocument.load(bytes,{ignoreEncryption:false});
+  ctx.sourceDocs.set(file,doc);
+  return doc;
+}
+function shouldAutoRotatePdf(embedded,rotation,boxW,boxH){
+  const base=rotatedVisualSize(embedded.width,embedded.height,rotation);
+  const current=Math.min(boxW/base.width,boxH/base.height);
+  const rotated={width:base.height,height:base.width};
+  const alt=Math.min(boxW/rotated.width,boxH/rotated.height);
+  return alt>current*1.08;
+}
+function drawEmbeddedPdfContained(targetPage,embedded,box,rotation=0,allowAutoRotate=false){
+  let n=((Number(rotation)||0)%360+360)%360;
+  if(allowAutoRotate && shouldAutoRotatePdf(embedded,n,box.w,box.h))n=(n+90)%360;
+  const visual=rotatedVisualSize(embedded.width,embedded.height,n);
+  const scale=Math.min(box.w/visual.width,box.h/visual.height);
+  const visualW=visual.width*scale,visualH=visual.height*scale;
+  const x0=box.x+(box.w-visualW)/2,y0=box.y+(box.h-visualH)/2;
+  const w=embedded.width*scale,h=embedded.height*scale;
+  const {degrees}=PDFLib;
+  if(n===90)targetPage.drawPage(embedded,{x:x0+visualW,y:y0,width:w,height:h,rotate:degrees(90)});
+  else if(n===180)targetPage.drawPage(embedded,{x:x0+visualW,y:y0+visualH,width:w,height:h,rotate:degrees(180)});
+  else if(n===270)targetPage.drawPage(embedded,{x:x0,y:y0+visualH,width:w,height:h,rotate:degrees(270)});
+  else targetPage.drawPage(embedded,{x:x0,y:y0,width:w,height:h});
+}
+function drawEmbeddedImageContained(targetPage,img,box){
+  const ratio=Math.min(box.w/img.width,box.h/img.height);
+  const w=img.width*ratio,h=img.height*ratio;
+  targetPage.drawImage(img,{x:box.x+(box.w-w)/2,y:box.y+(box.h-h)/2,width:w,height:h});
+}
+function compositionGrid(pages,box){
+  const count=pages.length;
+  const portraits=pages.filter(p=>{
+    const a=p.adjust||defaultAdjust();
+    const base=canPreservePdfPage(p)&&a.originalPaper
+      ? rotatedVisualSize(a.originalPaper.width,a.originalPaper.height,a.rotation)
+      : rotatedVisualSize(p.sourceCanvas?.width||1,p.sourceCanvas?.height||1,a.rotation);
+    return base.height>=base.width;
+  }).length;
+  let cols=1,rows=count;
+  if(count===2){if(portraits===2){cols=2;rows=1;}else{cols=1;rows=2;}}
+  else if(count===3){if(portraits>=2){cols=3;rows=1;}else{cols=1;rows=3;}}
+  else if(count===4){cols=2;rows=2;}
+  else if(count===5||count===6){cols=2;rows=3;}
+  const gap=Math.min(14,Math.max(7,Math.min(box.w,box.h)*.018));
+  const cellW=(box.w-gap*(cols-1))/cols,cellH=(box.h-gap*(rows-1))/rows,cells=[];
+  for(let i=0;i<count;i++){
+    const col=i%cols,row=Math.floor(i/cols);
+    cells.push({x:box.x+col*(cellW+gap),y:box.y+box.h-(row+1)*cellH-row*gap,w:cellW,h:cellH});
+  }
+  return cells;
+}
+function canDirectCopyNativeItem(item,settings){
+  if(item.pages.length!==1)return false;
+  const p=item.pages[0],a=p.adjust||defaultAdjust();
+  return canPreservePdfPage(p) &&
+    settings.paperSize==="original" &&
+    Number(settings.marginX||0)===0 &&
+    Number(settings.marginY||0)===0 &&
+    !settings.autoRotateFit &&
+    (((Number(a.rotation)||0)%360+360)%360)===0 &&
+    !els.includeLetterhead.checked &&
+    !els.includeHeader.checked &&
+    !els.includePageNumbers.checked &&
+    !els.includeFooterInfo.checked;
+}
+async function addHiddenOcrText(page,item,fonts){
+  if(!els.embedOcrText.checked)return;
+  const text=item.pages.map(p=>p.ocrText||"").filter(Boolean).join("\n");
+  if(text)page.drawText(text.slice(0,5000),{x:8,y:4,size:1,font:fonts.montserrat,color:PDFLib.rgb(1,1,1),opacity:.01});
+}
+async function addNativeOrRasterExportItem(pdf,item,doc,att,cfg){
+  const settings=cfg.paper||item.paper||paperSettingsFromAdjust(item.pages[0]?.adjust||defaultAdjust());
+
+  if(canDirectCopyNativeItem(item,settings)){
+    const p=item.pages[0],src=await getNativeSourceDocument(p,cfg.nativeCtx);
+    const [copied]=await pdf.copyPages(src,[p.sourcePdfPageIndex]);
+    pdf.addPage(copied);
+    await addHiddenOcrText(copied,item,cfg.fonts);
+    return copied;
+  }
+
+  const {rgb}=PDFLib,[paperW,paperH]=getPaperFromSettings(settings);
+  const page=pdf.addPage([paperW,paperH]);
+  page.drawRectangle({x:0,y:0,width:paperW,height:paperH,color:rgb(1,1,1)});
+  const template=els.globalTemplate.value;
+  if(els.includeLetterhead.checked){
+    const bg=await loadBg(pdf,template,"letterhead");
+    if(bg)page.drawImage(bg,{x:0,y:0,width:paperW,height:paperH});
+  }
+
+  const marginX=mmToPt(settings.marginX),marginY=mmToPt(settings.marginY);
+  const header=els.includeHeader.checked?36:10,footer=(els.includePageNumbers.checked||els.includeFooterInfo.checked)?34:10;
+  const box={x:marginX,y:marginY+footer,w:Math.max(20,paperW-2*marginX),h:Math.max(20,paperH-2*marginY-header-footer)};
+  const cells=item.pages.length>1?compositionGrid(item.pages,box):[box];
+
+  for(let i=0;i<item.pages.length;i++){
+    const p=item.pages[i],cell=cells[i]||box;
+    if(canPreservePdfPage(p)){
+      const embedded=await getNativeEmbeddedPage(pdf,p,cfg.nativeCtx);
+      drawEmbeddedPdfContained(page,embedded,cell,p.adjust?.rotation||0,!!settings.autoRotateFit);
+    }else{
+      let c=makePageCanvas(p,false);
+      if(settings.autoRotateFit)c=orientCanvasForBox(c,cell.w,cell.h);
+      const img=await embedCanvasForQuality(pdf,c);
+      drawEmbeddedImageContained(page,img,cell);
+    }
+  }
+
+  drawHeaderFooter(page,doc,att,{paperW,paperH,fonts:cfg.fonts,counter:cfg.counter,total:cfg.total});
+  await addHiddenOcrText(page,item,cfg.fonts);
+  return page;
+}
+
 function getAttachmentExportItems(att){
   const pages=att.pages||[],byId=new Map(pages.map(p=>[p.id,p])),groups=(att.sheetGroups||[]).filter(g=>g.pageIds?.length>=2&&g.pageIds.length<=6),grouped=new Set(groups.flatMap(g=>g.pageIds)),firstMap=new Map(groups.map(g=>[g.pageIds[0],g])),items=[];
   if(groups.length){for(const p of pages){if(grouped.has(p.id)){const g=firstMap.get(p.id);if(g){const gp=g.pageIds.map(id=>byId.get(id)).filter(Boolean);if(gp.length)items.push({pages:gp,paper:g.paper||paperSettingsFromAdjust(gp[0].adjust)});}continue;}items.push({pages:[p],paper:paperSettingsFromAdjust(p.adjust)});}return items;}
@@ -1128,12 +1317,17 @@ async function addCanvasPageToPdf(pdf,pdfPageCanvas,doc,att,cfg){
 }
 
 async function buildPdf(docs){
-  const {PDFDocument}=PDFLib,pdf=await PDFDocument.create(),fonts=await getFonts(pdf),template=els.globalTemplate.value,total=countExportSheets(docs);let counter=0;
+  const {PDFDocument}=PDFLib,pdf=await PDFDocument.create(),fonts=await getFonts(pdf),template=els.globalTemplate.value,total=countExportSheets(docs);
+  const nativeCtx={bytesByFile:new Map(),embeddedByPage:new Map(),sourceDocs:new Map()};
+  let counter=0;
   for(const doc of docs){
     if(els.includeCover.checked)await addCover(pdf,doc,{fonts,template});
-    for(const att of doc.attachments){for(const item of getAttachmentExportItems(att)){counter++;const c=item.pages.length>1?makePackedSheetCanvas(item.pages,item.pages.length):makePageCanvas(item.pages[0],false);await addCanvasPageToPdf(pdf,c,doc,att,{fonts,counter,total,paper:item.paper});
-      if(els.embedOcrText.checked){const text=item.pages.map(p=>p.ocrText||"").filter(Boolean).join("\n");if(text){const page=pdf.getPages()[pdf.getPageCount()-1];page.drawText(text.slice(0,5000),{x:8,y:4,size:1,font:fonts.montserrat,color:PDFLib.rgb(1,1,1),opacity:.01});}}
-    }}
+    for(const att of doc.attachments){
+      for(const item of getAttachmentExportItems(att)){
+        counter++;
+        await addNativeOrRasterExportItem(pdf,item,doc,att,{fonts,counter,total,paper:item.paper,nativeCtx});
+      }
+    }
   }
   return new Blob([await pdf.save()],{type:"application/pdf"});
 }
