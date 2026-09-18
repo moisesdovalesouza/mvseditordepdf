@@ -169,3 +169,12 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Upload de capa e timbrado foi integrado às respectivas prévias, eliminando os campos de arquivo soltos e visualmente desconectados.
 - Etapa 1 ficou mais compacta para projetos com muitos Docs e anexos.
 - Mantidos grid, tema manual, upload unificado e revisão de responsividade da v28.
+
+
+## v30 — 18/09/2026
+
+- Papel ganhou opção **Original do anexo**. PDFs usam a dimensão original da página; imagens preservam a proporção original sem serem forçadas ao A4.
+- Novo card **Qualidade do PDF**: Compacto, Padrão, Alta e Máxima, com compressão real na exportação e estimativa de tamanho.
+- OCR aprimorado: ampliação controlada, normalização de contraste, reutilização de worker e segunda leitura binarizada quando a confiança fica baixa.
+- Detecção automática de perspectiva foi substituída por análise de quatro bordas inclinadas com ajuste robusto; só é executada ao clicar em **Detectar perspectiva**.
+- Exportação em Compacto/Padrão/Alta utiliza JPEG em níveis diferentes; Máxima preserva PNG.
