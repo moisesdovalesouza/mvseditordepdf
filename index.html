@@ -80,7 +80,7 @@
           <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">Claro</button>
           <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="false">Escuro</button>
         </div>
-        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 32</button>
+        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 33</button>
         <button id="installBtn" class="ghost install-cta" hidden>Instalar app</button>
       </div>
       </div>
@@ -471,6 +471,13 @@
                 <span id="qualitySummaryBadge" class="quality-summary-badge">Padrão</span>
               </summary>
               <div class="details-body">
+                <div class="native-pdf-row">
+                  <label class="checkline native-pdf-toggle">
+                    <input id="preservePdfNative" type="checkbox" checked />
+                    <span>Preservar PDF nativo</span>
+                  </label>
+                  <button class="info-tip" type="button" data-tip="Mantém texto, vetores e estrutura PDF sempre que a página não usar filtros ou correção de perspectiva. Papel, margens, capa, timbre, rotação e composição podem continuar vetoriais. A qualidade abaixo passa a afetar apenas imagens e páginas que precisarem ser rasterizadas." aria-label="Ajuda sobre preservação do PDF">i</button>
+                </div>
                 <div class="quality-options" role="radiogroup" aria-label="Qualidade do PDF">
                   <button class="quality-option" type="button" data-quality="compact">
                     <strong>Compacto</strong><small>arquivo menor</small>
@@ -644,7 +651,7 @@
             <p class="eyebrow">Versão e informações</p>
             <div class="about-title-line">
               <h2 id="aboutTitle">MVS Editor de PDF</h2>
-              <span class="about-version">v32</span>
+              <span class="about-version">v33</span>
             </div>
           </div>
         </div>
@@ -656,18 +663,19 @@
         </div>
 
         <section class="release-card">
-          <div class="release-title"><strong>Novidades da v32</strong><span>18/09/2026</span></div>
+          <div class="release-title"><strong>Novidades da v33</strong><span>18/09/2026</span></div>
           <ul class="release-list">
-            <li>Logo e favicon refeitos com zona segura para não cortar a marca.</li>
-            <li>Barra superior agora ocupa toda a largura da janela.</li>
-            <li>Interface visualmente mais discreta, com menos contraste em bordas e etapas.</li>
-            <li>Prévia e controles receberam proporções mais compactas e alinhadas.</li>
+            <li>PDFs importados passam a permanecer como conteúdo PDF nativo sempre que possível.</li>
+            <li>Texto e vetores deixam de ser convertidos em imagem apenas para montar o documento final.</li>
+            <li>Filtros e perspectiva continuam disponíveis e rasterizam somente a página que realmente precisar.</li>
+            <li>Qualidade Compacto/Padrão/Alta/Máxima passa a agir principalmente sobre imagens e páginas rasterizadas.</li>
           </ul>
         </section>
 
         <details class="history-card">
           <summary>Histórico de atualizações</summary>
           <div class="history-list">
+            <article><strong>v32 · 18/09/2026</strong><p>Polimento visual, cabeçalho em largura total e correções de identidade/favicon.</p></article>
             <article><strong>v31 · 18/09/2026</strong><p>Nova identidade visual, ícones PWA e favicon.</p></article>
             <article><strong>v30 · 18/09/2026</strong><p>Tamanho original, qualidade do PDF, OCR aprimorado e nova detecção de perspectiva.</p></article>
             <article><strong>v29 · 18/09/2026</strong><p>Docs com anexos recolhíveis, ajuda contextual e capa/timbrado integrados às prévias.</p></article>
