@@ -7,10 +7,12 @@
   <meta name="description" content="Editor de PDF jurídico por etapas, com digitalização, capa, timbre, OCR e exportação." />
   <meta name="theme-color" content="#f8f6ef" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#101828" media="(prefers-color-scheme: dark)" />
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="./icons/icon-192.png" type="image/png" />
-  <link rel="apple-touch-icon" href="./icons/icon-512.png" />
-  <meta name="msapplication-TileColor" content="#062a4e" />
+  <link rel="manifest" href="./manifest.webmanifest?v=32" />
+  <link rel="icon" type="image/x-icon" href="./icons/favicon.ico?v=32" />
+  <link rel="shortcut icon" type="image/x-icon" href="./icons/favicon.ico?v=32" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-192.png?v=32" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-512.png?v=32" />
+  <meta name="msapplication-TileColor" content="#06294b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="MVS PDF" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -64,8 +66,9 @@
   <div class="app-ambient" aria-hidden="true"></div>
   <div class="shell">
     <header class="app-header">
+      <div class="app-header-inner">
       <div class="brand">
-        <img src="./icons/icon-192.png" alt="MVS Editor de PDF" class="brand-logo app-icon-logo" />
+        <img src="./icons/icon-192.png?v=32" alt="MVS Editor de PDF" class="brand-logo app-icon-logo" />
         <div>
           <p class="eyebrow">Processamento local</p>
           <h1>MVS Editor de PDF</h1>
@@ -77,8 +80,9 @@
           <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">Claro</button>
           <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="false">Escuro</button>
         </div>
-        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 31</button>
+        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 32</button>
         <button id="installBtn" class="ghost install-cta" hidden>Instalar app</button>
+      </div>
       </div>
     </header>
 
@@ -182,9 +186,11 @@
                 <span class="card-icon icon-docs">DOC</span>
                 <h2>Docs do projeto</h2>
                               </div>
-              <button id="addDocBtn" class="ghost">+ Novo Doc</button>
+              <div class="docs-toolbar">
+                <button id="renumberDocsBtn" class="ghost small">Renumerar</button>
+                <button id="addDocBtn" class="ghost">+ Novo Doc</button>
+              </div>
             </div>
-            <button id="renumberDocsBtn" class="ghost small">Renumerar Docs</button>
             <div id="docTabs" class="doc-tabs"></div>
           </section>
         </div>
@@ -638,7 +644,7 @@
             <p class="eyebrow">Versão e informações</p>
             <div class="about-title-line">
               <h2 id="aboutTitle">MVS Editor de PDF</h2>
-              <span class="about-version">v31</span>
+              <span class="about-version">v32</span>
             </div>
           </div>
         </div>
@@ -650,18 +656,19 @@
         </div>
 
         <section class="release-card">
-          <div class="release-title"><strong>Novidades da v31</strong><span>18/09/2026</span></div>
+          <div class="release-title"><strong>Novidades da v32</strong><span>18/09/2026</span></div>
           <ul class="release-list">
-            <li>Nova identidade visual oficial do MVS Editor de PDF.</li>
-            <li>Ícones específicos para Windows, Android/Chrome, iPhone/iPad e favicon.</li>
-            <li>Versão maskable com zona segura para ícones adaptativos do Android.</li>
-            <li>Logo do cabeçalho atualizada e integrada ao design do aplicativo.</li>
+            <li>Logo e favicon refeitos com zona segura para não cortar a marca.</li>
+            <li>Barra superior agora ocupa toda a largura da janela.</li>
+            <li>Interface visualmente mais discreta, com menos contraste em bordas e etapas.</li>
+            <li>Prévia e controles receberam proporções mais compactas e alinhadas.</li>
           </ul>
         </section>
 
         <details class="history-card">
           <summary>Histórico de atualizações</summary>
           <div class="history-list">
+            <article><strong>v31 · 18/09/2026</strong><p>Nova identidade visual, ícones PWA e favicon.</p></article>
             <article><strong>v30 · 18/09/2026</strong><p>Tamanho original, qualidade do PDF, OCR aprimorado e nova detecção de perspectiva.</p></article>
             <article><strong>v29 · 18/09/2026</strong><p>Docs com anexos recolhíveis, ajuda contextual e capa/timbrado integrados às prévias.</p></article>
             <article><strong>v28 · 18/09/2026</strong><p>Tema manual independente, upload unificado, grid revisado e painel de versão/histórico.</p></article>
