@@ -3128,3 +3128,29 @@ button{
 .perspective-actions{display:flex;align-items:center;gap:8px;margin:10px 0 12px}.perspective-actions #autoCornersBtn{flex:1}
 select:disabled,input:disabled{opacity:.58;cursor:not-allowed}
 @media(max-width:520px){.quality-options{grid-template-columns:1fr 1fr}.quality-estimate{grid-template-columns:1fr auto}.quality-estimate>span{grid-column:1/-1}}
+
+
+/* v31 — nova identidade visual */
+.brand-logo,
+html[data-theme="dark"] .brand-logo,
+html[data-theme="light"] .brand-logo,
+html.force-dark .brand-logo,
+html.force-light .brand-logo {
+  width: 42px;
+  height: 42px;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  box-shadow: 0 5px 16px -10px rgba(6, 42, 78, .7) !important;
+  object-fit: contain;
+}
+@media (max-width: 520px) {
+  .brand-logo,
+  html[data-theme="dark"] .brand-logo,
+  html[data-theme="light"] .brand-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px !important;
+  }
+}

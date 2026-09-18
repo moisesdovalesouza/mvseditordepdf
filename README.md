@@ -178,3 +178,14 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - OCR aprimorado: ampliação controlada, normalização de contraste, reutilização de worker e segunda leitura binarizada quando a confiança fica baixa.
 - Detecção automática de perspectiva foi substituída por análise de quatro bordas inclinadas com ajuste robusto; só é executada ao clicar em **Detectar perspectiva**.
 - Exportação em Compacto/Padrão/Alta utiliza JPEG em níveis diferentes; Máxima preserva PNG.
+
+
+## v31 — 18/09/2026
+
+- Nova identidade visual oficial do MVS Editor de PDF.
+- Logo aplicada ao cabeçalho e ao ícone principal.
+- Favicon e ícones PWA atualizados.
+- Ícones 192 e 512 px para Chrome, Windows e instalação PWA.
+- Apple Touch Icon usando a nova identidade em alta resolução.
+- Ícone `maskable` de 512 px com margem de segurança maior para Android.
+- Cache do PWA atualizado para `mvs-editor-de-pdf-v31`.

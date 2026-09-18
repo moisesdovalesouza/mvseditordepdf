@@ -1,9 +1,7 @@
-const CACHE = "mvs-editor-de-pdf-v30";
+const CACHE = "mvs-editor-de-pdf-v31";
 const ASSETS = [
   "./","./index.html","./style.css","./app.js","./manifest.webmanifest",
-  "./icons/favicon.ico","./icons/icon-16.png","./icons/icon-32.png","./icons/icon-48.png","./icons/icon-72.png",
-  "./icons/icon-96.png","./icons/icon-128.png","./icons/icon-144.png","./icons/apple-touch-icon.png","./icons/icon-192.png","./icons/icon-256.png",
-  "./icons/icon-384.png","./icons/icon-512.png","./icons/maskable-512.png",
+  "./icons/icon-192.png","./icons/icon-512.png","./icons/maskable-512.png",
   "./assets/mvs-cover.png","./assets/mvs-letterhead.png","./assets/gdv-cover.png","./assets/gdv-letterhead.png"
 ];
 const CORE = new Set(["index.html","style.css","app.js","manifest.webmanifest"]);
