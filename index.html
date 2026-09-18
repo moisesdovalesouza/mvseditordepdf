@@ -7,12 +7,10 @@
   <meta name="description" content="Editor de PDF jurídico por etapas, com digitalização, capa, timbre, OCR e exportação." />
   <meta name="theme-color" content="#f8f6ef" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#101828" media="(prefers-color-scheme: dark)" />
-  <link rel="manifest" href="./manifest.webmanifest?v=35" />
-  <link rel="icon" type="image/x-icon" href="./icons/favicon.ico?v=35" />
-  <link rel="shortcut icon" type="image/x-icon" href="./icons/favicon.ico?v=35" />
-  <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32.png?v=35" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=35" />
-  <meta name="msapplication-TileColor" content="#06294b" />
+  <link rel="manifest" href="./manifest.webmanifest?v=36" />
+<meta name="msapplication-TileColor" content="#06294b" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/app-icon-v36-192.png?v=36" />
+  <link rel="apple-touch-icon" href="./icons/app-icon-v36-512.png?v=36" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="MVS PDF" />
@@ -70,7 +68,7 @@
     <header class="app-header">
       <div class="app-header-inner">
       <div class="brand">
-        <img src="./icons/icon-192.png?v=32" alt="MVS Editor de PDF" class="brand-logo app-icon-logo" />
+        <img src="./icons/app-icon-v36-192.png?v=36" alt="MVS Editor de PDF" class="brand-logo app-icon-logo" width="48" height="48" />
         <div>
           <p class="eyebrow">Processamento local</p>
           <h1>MVS Editor de PDF</h1>
@@ -82,7 +80,7 @@
           <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">Claro</button>
           <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="false">Escuro</button>
         </div>
-        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 35</button>
+        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 36</button>
         <button id="installBtn" class="ghost install-cta" hidden>Instalar app</button>
       </div>
       </div>
@@ -670,7 +668,7 @@
             <p class="eyebrow">Versão e informações</p>
             <div class="about-title-line">
               <h2 id="aboutTitle">MVS Editor de PDF</h2>
-              <span class="about-version">v35</span>
+              <span class="about-version">v36</span>
             </div>
           </div>
         </div>
@@ -682,18 +680,19 @@
         </div>
 
         <section class="release-card">
-          <div class="release-title"><strong>Novidades da v35</strong><span>18/09/2026</span></div>
+          <div class="release-title"><strong>Novidades da v36</strong><span>18/09/2026</span></div>
           <ul class="release-list">
-            <li>Instalação móvel refeita para Android, Chrome e iPhone/iPad.</li>
-            <li>Botão Instalar app passa a aparecer também quando o navegador não oferece o prompt automático.</li>
-            <li>iPhone/iPad recebem instrução própria para “Adicionar à Tela de Início”.</li>
-            <li>Manifesto, Service Worker e referências de ícones atualizados para v35.</li>
+            <li>Ícone interno do aplicativo corrigido com um novo arquivo físico no repositório.</li>
+            <li>Manifesto passa a apontar para novos ícones 192 e 512 da identidade aprovada.</li>
+            <li>Favicon e Apple Touch Icon usam os mesmos assets novos, evitando referências quebradas.</li>
+            <li>Instalações novas no Windows e Chrome passam a receber a nova identidade visual.</li>
           </ul>
         </section>
 
         <details class="history-card">
           <summary>Histórico de atualizações</summary>
           <div class="history-list">
+            <article><strong>v35 · 18/09/2026</strong><p>Fluxo de instalação PWA para Android e iPhone/iPad.</p></article>
             <article><strong>v34 · 18/09/2026</strong><p>Cards recolhidos, qualidade corrigida e eixo horizontal unificado.</p></article>
             <article><strong>v33 · 18/09/2026</strong><p>Preservação de PDF nativo e exportação vetorial sempre que possível.</p></article>
             <article><strong>v32 · 18/09/2026</strong><p>Polimento visual, cabeçalho em largura total e correções de identidade/favicon.</p></article>

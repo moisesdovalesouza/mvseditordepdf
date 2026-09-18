@@ -234,3 +234,13 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Manifesto ganhou `id`, `prefer_related_applications=false`, `display_override` e referências atualizadas.
 - Service Worker é registrado com versão v35 e cache atualizado.
 - Ícones e Apple Touch Icon recebem cache-busting v35.
+
+
+## v36 — 18/09/2026
+
+- Corrigida a causa real do ícone ausente: os binários da nova identidade agora existem no próprio repositório.
+- Cabeçalho usa o novo ícone 192 px da v36.
+- Manifesto PWA usa novos ícones 192 e 512 px.
+- Favicon e Apple Touch Icon usam os novos assets.
+- Service Worker atualizado para cache `mvs-editor-de-pdf-v36-icons`.
+- Instalações já existentes no Windows podem exigir uma reinstalação única para reconstruir o atalho e o ícone da barra de tarefas.
