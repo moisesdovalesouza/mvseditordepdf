@@ -34,6 +34,7 @@
           <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">Claro</button>
           <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="false">Escuro</button>
         </div>
+        <button id="aboutBtn" class="ghost about-cta" type="button">Sobre</button>
         <button id="installBtn" class="ghost install-cta" hidden>Instalar app</button>
       </div>
     </header>
@@ -62,13 +63,9 @@
                 <h2>Enviar arquivos</h2>
                 <p>PDFs e imagens entram no Doc selecionado e podem virar anexos ou faces na mesma folha.</p>
               </div>
-              <label class="view-mode">Visualização
-                <select id="attachmentViewMode">
-                  <option value="list">Lista</option>
-                  <option value="thumbs">Miniaturas</option>
-                  <option value="mixed" selected>Lista com miniaturas</option>
-                </select>
-              </label>
+              <select id="attachmentViewMode" hidden aria-hidden="true">
+                <option value="mixed" selected>Lista com miniaturas</option>
+              </select>
             </div>
 
             <div class="upload-helper">
@@ -117,8 +114,7 @@
                 <input id="cameraInput" class="camera-input" type="file" accept="image/*" capture="environment" />
                 <label id="openCameraBtn" for="cameraInput" class="camera-btn" role="button" tabindex="0">
                   <span class="camera-icon" aria-hidden="true">CAM</span>
-                  <strong>Fotografar documento</strong>
-                  <small>Usar câmera do celular</small>
+                  <span class="camera-copy"><strong>Fotografar documento</strong><small>Abrir câmera traseira</small></span>
                 </label>
                 <p class="hint">No celular, abre a câmera traseira quando o navegador permite. No computador, permite selecionar uma imagem.</p>
               </div>
@@ -138,7 +134,8 @@
               </label>
             </div>
 
-            <div id="attachmentList" class="attachment-list mixed"></div>
+            <div class="single-source-note">Os anexos são organizados e editados somente no card <strong>Docs do projeto</strong>, ao lado.</div>
+            <div id="attachmentList" class="attachment-list mixed" hidden aria-hidden="true"></div>
           </section>
 
           <section class="card docs-card">
@@ -192,6 +189,21 @@
                     <option value="gdv">GdV Advogados</option>
                   </select>
                 </label>
+                <div class="custom-template-grid">
+                  <div class="custom-template-field">
+                    <label>Capa própria
+                      <input id="customCoverFile" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" />
+                    </label>
+                    <div class="custom-file-row"><small id="customCoverName">Nenhuma capa própria.</small><button id="clearCustomCoverBtn" class="small ghost" type="button">Remover</button></div>
+                  </div>
+                  <div class="custom-template-field">
+                    <label>Timbrado próprio
+                      <input id="customLetterheadFile" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" />
+                    </label>
+                    <div class="custom-file-row"><small id="customLetterheadName">Nenhum timbrado próprio.</small><button id="clearCustomLetterheadBtn" class="small ghost" type="button">Remover</button></div>
+                  </div>
+                </div>
+                <p class="hint">PDF, JPG ou PNG. A primeira página do PDF é usada como fundo. Arquivos próprios substituem o fundo do modelo apenas naquele tipo: capa ou timbrado.</p>
                 <div class="template-preview-grid" aria-label="Prévia visual do modelo">
                   <div class="template-preview-card">
                     <span>Capa</span>
@@ -273,10 +285,18 @@
             </div>
 
             <div class="page-filmstrip-wrap">
-              <div class="section-actions">
-                <button id="removePageBtn" class="small danger">Remover página</button>
-                <button id="movePageUpBtn" class="small">Mover esquerda</button>
-                <button id="movePageDownBtn" class="small">Mover direita</button>
+              <div class="page-action-grid">
+                <div class="section-actions compact-actions">
+                  <button id="removePageBtn" class="small danger">Remover página</button>
+                  <button id="movePageUpBtn" class="small">Mover esquerda</button>
+                  <button id="movePageDownBtn" class="small">Mover direita</button>
+                </div>
+                <div class="sheet-selection-bar">
+                  <span id="pageSelectionCount">0 de 6 selecionadas</span>
+                  <button id="composeSelectedPagesBtn" class="small primary" type="button" disabled>Juntar selecionadas em 1 folha</button>
+                  <button id="clearPageSelectionBtn" class="small ghost" type="button">Limpar seleção</button>
+                  <button id="clearCompositionsBtn" class="small ghost" type="button">Desfazer composições</button>
+                </div>
               </div>
               <div id="pageFilmstrip" class="page-filmstrip"></div>
             </div>
@@ -293,10 +313,16 @@
                 <span class="card-icon icon-paper">A4</span>
                 <span>
                   <strong>Papel e área útil</strong>
-                  <small>Tamanho, orientação e margem do conteúdo.</small>
+                  <small>Configuração individual por página ou por anexo, sem distorção.</small>
                 </span>
               </summary>
               <div class="details-body">
+                <label>Aplicar configuração de papel em
+                  <select id="paperScope">
+                    <option value="page" selected>Somente esta página</option>
+                    <option value="attachment">Todas as páginas deste anexo</option>
+                  </select>
+                </label>
                 <div class="two-col">
                   <label>Papel
                     <select id="paperSize">
@@ -305,16 +331,21 @@
                       <option value="legal">Ofício/Legal</option>
                     </select>
                   </label>
-                  <label>Orientação
+                  <label>Orientação da folha
                     <select id="orientation">
                       <option value="portrait" selected>Retrato</option>
                       <option value="landscape">Paisagem</option>
                     </select>
                   </label>
                 </div>
-                <label>Margem do conteúdo: <span id="paperMarginValue">10</span> mm
-                  <input id="paperMargin" type="range" min="0" max="30" value="10" />
+                <label>Margens laterais: <span id="paperMarginValue">10</span> mm
+                  <input id="paperMargin" type="range" min="0" max="45" value="10" />
                 </label>
+                <label>Margens superior e inferior: <span id="paperMarginYValue">10</span> mm
+                  <input id="paperMarginY" type="range" min="0" max="80" value="10" />
+                </label>
+                <label class="checkline"><input id="autoRotateFit" type="checkbox" /> Permitir giro automático para melhorar o encaixe</label>
+                <p class="hint">Sem giro automático, uma página em paisagem permanece legível dentro de uma folha retrato, centralizada horizontal e verticalmente, sem esticar ou cortar.</p>
               </div>
             </details>
 
@@ -484,8 +515,34 @@
       <input id="docTitle" type="text" />
       <select id="docClassification"></select>
     </div>
+    <input id="nestedAttachmentFileInput" type="file" multiple accept="image/*,application/pdf" hidden />
 </main>
 
+
+
+    <div id="aboutModal" class="modal-backdrop" hidden aria-hidden="true">
+      <div class="confirm-dialog about-dialog" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+        <div class="about-head">
+          <div class="confirm-icon about-icon">MVS</div>
+          <div>
+            <p class="eyebrow">Sobre o aplicativo</p>
+            <h2 id="aboutTitle">MVS Editor de PDF</h2><small class="about-version">Versão 27</small>
+            <p>Ferramenta para organizar Docs, anexos e páginas, corrigir digitalizações, montar múltiplas faces, aplicar capa/timbrado, OCR e exportar documentos jurídicos em PDF.</p>
+          </div>
+        </div>
+        <div class="about-grid">
+          <div><strong>Função</strong><p>Editor e montador de PDFs com processamento local no navegador.</p></div>
+          <div><strong>Criador</strong><p>Moisés do Vale Souza</p></div>
+        </div>
+        <div class="social-links" aria-label="Redes sociais do criador">
+          <a href="https://instagram.com/moisesdovalesouza" target="_blank" rel="noopener">Instagram · @moisesdovalesouza</a>
+          <a href="https://www.threads.net/@moisesdovalesouza" target="_blank" rel="noopener">Threads · @moisesdovalesouza</a>
+          <a href="https://github.com/moisesdovalesouza" target="_blank" rel="noopener">GitHub · @moisesdovalesouza</a>
+          <a href="https://x.com/moisesdovalesou" target="_blank" rel="noopener">X · @moisesdovalesou</a>
+        </div>
+        <div class="confirm-actions"><button id="closeAboutBtn" class="primary" type="button">Fechar</button></div>
+      </div>
+    </div>
 
     <div id="confirmModal" class="modal-backdrop" hidden aria-hidden="true">
       <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
