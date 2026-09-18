@@ -53,12 +53,12 @@ if (window.pdfjsLib) {
 
 const $ = id => document.getElementById(id);
 const els = {
-  installBtn:$("installBtn"), aboutBtn:$("aboutBtn"), aboutModal:$("aboutModal"), closeAboutBtn:$("closeAboutBtn"), newProjectBtn:$("newProjectBtn"),
+  installBtn:$("installBtn"), aboutBtn:$("aboutBtn"), aboutModal:$("aboutModal"), closeAboutBtn:$("closeAboutBtn"), copyPixBtn:$("copyPixBtn"), newProjectBtn:$("newProjectBtn"), uploadSourceModal:$("uploadSourceModal"), chooseFilesBtn:$("chooseFilesBtn"), takePhotoBtn:$("takePhotoBtn"), closeUploadSourceBtn:$("closeUploadSourceBtn"),
   includeCover:$("includeCover"), includeLetterhead:$("includeLetterhead"), globalTemplate:$("globalTemplate"), customCoverFile:$("customCoverFile"), customLetterheadFile:$("customLetterheadFile"), customCoverName:$("customCoverName"), customLetterheadName:$("customLetterheadName"), clearCustomCoverBtn:$("clearCustomCoverBtn"), clearCustomLetterheadBtn:$("clearCustomLetterheadBtn"),
   fontMontserratRegular:$("fontMontserratRegular"), fontMontserratBold:$("fontMontserratBold"), fontLibreRegular:$("fontLibreRegular"),
   addDocBtn:$("addDocBtn"), renumberDocsBtn:$("renumberDocsBtn"), docTabs:$("docTabs"),
   docNumber:$("docNumber"), docTitle:$("docTitle"), docClassification:$("docClassification"),
-  scanType:$("scanType"), uploadMode:$("uploadMode"), facesPerSheet:$("facesPerSheet"), facesPerSheetWrap:$("facesPerSheetWrap"), scanHint:$("scanHint"), fileInput:$("fileInput"), cameraInput:$("cameraInput"), openCameraBtn:$("openCameraBtn"), nestedAttachmentFileInput:$("nestedAttachmentFileInput"), dropzone:$("dropzone"), attachmentViewMode:$("attachmentViewMode"),
+  scanType:$("scanType"), uploadMode:$("uploadMode"), facesPerSheet:$("facesPerSheet"), facesPerSheetWrap:$("facesPerSheetWrap"), scanHint:$("scanHint"), fileInput:$("fileInput"), cameraInput:$("cameraInput"), nestedAttachmentFileInput:$("nestedAttachmentFileInput"), dropzone:$("dropzone"), attachmentViewMode:$("attachmentViewMode"),
   sortImportanceBtn:$("sortImportanceBtn"), sortAlphaBtn:$("sortAlphaBtn"), sortTypeBtn:$("sortTypeBtn"), sortDateBtn:$("sortDateBtn"), attachmentSortSelect:$("attachmentSortSelect"), coverTemplatePreview:$("coverTemplatePreview"), letterheadTemplatePreview:$("letterheadTemplatePreview"),
   attachmentList:$("attachmentList"), removeAttachmentBtn:$("removeAttachmentBtn"), mergeSmallDocsBtn:$("mergeSmallDocsBtn"),
   editDocSelect:$("editDocSelect"), editAttachmentSelect:$("editAttachmentSelect"), attachmentThumbStrip:$("attachmentThumbStrip"),
@@ -1311,16 +1311,37 @@ function bind(){
     await handleFiles(e.target.files);
     e.target.value="";
   };
-  if(els.nestedAttachmentFileInput) els.nestedAttachmentFileInput.onchange=async e=>{await addFilesToSpecificAttachment(e.target.files,state.pendingAttachmentTarget);state.pendingAttachmentTarget=null;e.target.value="";};
-  if(els.openCameraBtn && els.cameraInput) {
-    els.openCameraBtn.addEventListener("keydown", e=>{
-      if(e.key==="Enter" || e.key===" "){ e.preventDefault(); els.cameraInput.click(); }
-    });
-  }
+  if(els.nestedAttachmentFileInput) els.nestedAttachmentFileInput.onchange=async e=>{
+    await addFilesToSpecificAttachment(e.target.files,state.pendingAttachmentTarget);
+    state.pendingAttachmentTarget=null;
+    e.target.value="";
+  };
   if(els.cameraInput) els.cameraInput.onchange=async e=>{
     await handleFiles(e.target.files);
     e.target.value="";
   };
+
+  const openUploadSource=()=>{
+    if(!els.uploadSourceModal)return;
+    els.uploadSourceModal.hidden=false;
+    els.uploadSourceModal.setAttribute("aria-hidden","false");
+    requestAnimationFrame(()=>els.uploadSourceModal.classList.add("visible"));
+  };
+  const closeUploadSource=()=>{
+    if(!els.uploadSourceModal)return;
+    els.uploadSourceModal.classList.remove("visible");
+    els.uploadSourceModal.setAttribute("aria-hidden","true");
+    setTimeout(()=>{els.uploadSourceModal.hidden=true;},140);
+  };
+  els.dropzone.addEventListener("click",openUploadSource);
+  els.dropzone.addEventListener("keydown",e=>{
+    if(e.key==="Enter"||e.key===" "){e.preventDefault();openUploadSource();}
+  });
+  if(els.chooseFilesBtn)els.chooseFilesBtn.onclick=()=>{closeUploadSource();els.fileInput.click();};
+  if(els.takePhotoBtn)els.takePhotoBtn.onclick=()=>{closeUploadSource();els.cameraInput.click();};
+  if(els.closeUploadSourceBtn)els.closeUploadSourceBtn.onclick=closeUploadSource;
+  if(els.uploadSourceModal)els.uploadSourceModal.onclick=e=>{if(e.target===els.uploadSourceModal)closeUploadSource();};
+
   ["dragenter","dragover"].forEach(evt=>els.dropzone.addEventListener(evt,e=>{e.preventDefault();els.dropzone.classList.add("dragover")}));
   ["dragleave","drop"].forEach(evt=>els.dropzone.addEventListener(evt,e=>{e.preventDefault();els.dropzone.classList.remove("dragover")}));
   els.dropzone.addEventListener("drop",e=>handleFiles(e.dataTransfer.files));
@@ -1362,7 +1383,21 @@ function bind(){
   [els.exportMode, els.outputName].forEach(el => el && el.addEventListener("change", () => { if ($("step3").classList.contains("active")) previewPdf().catch(e=>setStatus("Erro ao pré-visualizar: "+e.message)); }));
   els.downloadPreviewBtn.onclick=()=>{if(state.lastBlobUrl)downloadBlobUrl(state.lastBlobUrl,outputNameForDocs(state.docs));};
   els.newProjectBtn.onclick=()=>openNewProjectConfirm();
-  if(els.aboutBtn)els.aboutBtn.onclick=()=>openAbout(); if(els.closeAboutBtn)els.closeAboutBtn.onclick=closeAbout; if(els.aboutModal)els.aboutModal.onclick=e=>{if(e.target===els.aboutModal)closeAbout();};
+  if(els.aboutBtn)els.aboutBtn.onclick=()=>openAbout();
+  if(els.closeAboutBtn)els.closeAboutBtn.onclick=closeAbout;
+  if(els.aboutModal)els.aboutModal.onclick=e=>{if(e.target===els.aboutModal)closeAbout();};
+  if(els.copyPixBtn)els.copyPixBtn.onclick=async()=>{
+    const key="moisesdovalesouza@gmail.com";
+    try{
+      await navigator.clipboard.writeText(key);
+      setStatus("Chave Pix copiada.");
+    }catch(_){
+      const ta=document.createElement("textarea");
+      ta.value=key;ta.style.position="fixed";ta.style.opacity="0";
+      document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();
+      setStatus("Chave Pix copiada.");
+    }
+  };
   els.overlay.querySelectorAll(".drag").forEach(h=>h.onpointerdown=e=>{e.preventDefault();h.setPointerCapture(e.pointerId);state.drag=h.dataset.handle;});
   window.onpointermove=e=>{
     if(!state.drag)return;
@@ -1446,9 +1481,3 @@ addDoc();
 function setupInteractiveLight(){ /* desativado por desempenho */ }
 
 
-// Tema: Sistema / Claro / Escuro
-(function initMvsThemeSelector(){
-  const root=document.documentElement,storageKey="mvs-pdf-theme",media=window.matchMedia("(prefers-color-scheme: dark)");
-  function apply(choice){choice=["system","light","dark"].includes(choice)?choice:"system";const resolved=choice==="system"?(media.matches?"dark":"light"):choice;root.dataset.theme=choice;root.dataset.resolvedTheme=resolved;try{localStorage.setItem(storageKey,choice)}catch(_){ }document.querySelectorAll("[data-theme-choice]").forEach(b=>{const on=b.dataset.themeChoice===choice;b.classList.toggle("active",on);b.setAttribute("aria-pressed",String(on));});document.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.setAttribute("content",resolved==="dark"?"#151c29":"#f7f3e9"));}
-  let saved="system";try{saved=localStorage.getItem(storageKey)||"system"}catch(_){ }apply(saved);document.addEventListener("click",e=>{const b=e.target.closest?.("[data-theme-choice]");if(b){e.preventDefault();apply(b.dataset.themeChoice);}});media.addEventListener?.("change",()=>{let c="system";try{c=localStorage.getItem(storageKey)||"system"}catch(_){ }if(c==="system")apply("system");});
-})();
