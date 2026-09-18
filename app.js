@@ -1431,8 +1431,16 @@ function goStep(n){
   $("step"+n).classList.add("active");
   document.querySelectorAll(".step").forEach(s=>s.classList.toggle("active",+s.dataset.step===n));
   render();
-  if (n === 3 && state.docs.some(d=>d.attachments.length)) {
-    setTimeout(() => previewPdf().catch(e=>setStatus("Erro ao pré-visualizar: "+e.message)), 260);
+  if(n===3){
+    const hasAttachments=state.docs.some(d=>d.attachments.length);
+    if(!hasAttachments){
+      if(els.pdfFrame){els.pdfFrame.removeAttribute("src");els.pdfFrame.style.display="none";}
+      if(els.previewEmpty){els.previewEmpty.style.display="grid";els.previewEmpty.textContent="Adicione documentos para gerar a pré-visualização.";}
+      if(els.downloadPreviewBtn)els.downloadPreviewBtn.disabled=true;
+      if(els.openPreviewLink)els.openPreviewLink.hidden=true;
+    }else{
+      setTimeout(()=>previewPdf().catch(e=>setStatus("Erro ao pré-visualizar: "+e.message)),260);
+    }
   }
 }
 
