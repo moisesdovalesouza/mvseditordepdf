@@ -77,7 +77,7 @@
           <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">Claro</button>
           <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="false">Escuro</button>
         </div>
-        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 28</button>
+        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 29</button>
         <button id="installBtn" class="ghost install-cta" hidden>Instalar app</button>
       </div>
     </header>
@@ -110,7 +110,11 @@
             </div>
 
             <div class="upload-helper">
-              <label>Tipo do documento a digitalizar
+              <label>
+                <span class="field-label-row">
+                  <span>Tipo do documento</span>
+                  <button id="scanInfoBtn" class="info-tip" type="button" data-tip="Escolha o tipo para adaptar o modo de montagem e organização das páginas." aria-label="Ajuda sobre tipo do documento">i</button>
+                </span>
                 <select id="scanType">
                   <option value="standard" selected>Documento A4 ou PDF comum</option>
                   <option value="id-front-back">Identificação frente e verso na mesma página</option>
@@ -123,7 +127,11 @@
                 </select>
               </label>
               <div class="two-col upload-mode-grid">
-                <label>Como anexar
+                <label>
+                  <span class="field-label-row">
+                    <span>Como anexar</span>
+                    <button class="info-tip" type="button" data-tip="Define se cada arquivo vira anexo, Doc, entra no anexo atual ou compõe várias faces na mesma folha." aria-label="Ajuda sobre como anexar">i</button>
+                  </span>
                   <select id="uploadMode">
                     <option value="new-attachment" selected>Cada arquivo vira um anexo</option>
                     <option value="doc-per-file">Cada arquivo vira um Doc</option>
@@ -139,8 +147,7 @@
                   </select>
                 </label>
               </div>
-              <p class="hint no-distort-rule">Regra fixa: nunca esticar, cortar ou deformar. O app reduz, centraliza e gira apenas quando isso melhorar o encaixe.</p>
-              <div id="scanHint" class="hint-box"></div>
+              <div id="scanHint" hidden aria-hidden="true"></div>
             </div>
 
             <div class="upload-entry-grid">
@@ -166,7 +173,6 @@
               </label>
             </div>
 
-            <div class="single-source-note">Os anexos são organizados e editados somente no card <strong>Docs do projeto</strong>, ao lado.</div>
             <div id="attachmentList" class="attachment-list mixed" hidden aria-hidden="true"></div>
           </section>
 
@@ -218,35 +224,40 @@
                     <option value="gdv">GdV Advogados</option>
                   </select>
                 </label>
-                <div class="custom-template-grid">
-                  <div class="custom-template-field">
-                    <label>Capa própria
-                      <input id="customCoverFile" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" />
-                    </label>
-                    <div class="custom-file-row"><small id="customCoverName">Nenhuma capa própria.</small><button id="clearCustomCoverBtn" class="small ghost" type="button">Remover</button></div>
-                  </div>
-                  <div class="custom-template-field">
-                    <label>Timbrado próprio
-                      <input id="customLetterheadFile" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" />
-                    </label>
-                    <div class="custom-file-row"><small id="customLetterheadName">Nenhum timbrado próprio.</small><button id="clearCustomLetterheadBtn" class="small ghost" type="button">Remover</button></div>
-                  </div>
-                </div>
-                <p class="hint">PDF, JPG ou PNG. A primeira página do PDF é usada como fundo. Arquivos próprios substituem o fundo do modelo apenas naquele tipo: capa ou timbrado.</p>
-                <div class="template-preview-grid" aria-label="Prévia visual do modelo">
-                  <div class="template-preview-card">
-                    <span>Capa</span>
+                <div class="template-preview-grid template-source-grid" aria-label="Capa e timbrado">
+                  <div class="template-preview-card template-source-card">
+                    <div class="template-source-head">
+                      <strong>Capa</strong>
+                      <button class="info-tip" type="button" data-tip="Aceita PDF, JPG, PNG ou WebP. Em PDF, a primeira página é usada como fundo." aria-label="Ajuda sobre capa própria">i</button>
+                    </div>
                     <canvas id="coverTemplatePreview" width="120" height="170"></canvas>
+                    <input id="customCoverFile" class="visually-hidden-file" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" />
+                    <div class="template-source-actions">
+                      <label for="customCoverFile" class="small ghost file-action-label">Escolher capa</label>
+                      <button id="clearCustomCoverBtn" class="small ghost danger" type="button">Remover</button>
+                    </div>
+                    <small id="customCoverName" class="template-source-name">Modelo padrão</small>
                   </div>
-                  <div class="template-preview-card">
-                    <span>Timbrado</span>
+
+                  <div class="template-preview-card template-source-card">
+                    <div class="template-source-head">
+                      <strong>Timbrado</strong>
+                      <button class="info-tip" type="button" data-tip="Aceita PDF, JPG, PNG ou WebP. O timbrado é aplicado como fundo das páginas sem sofrer perspectiva ou filtros." aria-label="Ajuda sobre timbrado próprio">i</button>
+                    </div>
                     <canvas id="letterheadTemplatePreview" width="120" height="170"></canvas>
+                    <input id="customLetterheadFile" class="visually-hidden-file" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" />
+                    <div class="template-source-actions">
+                      <label for="customLetterheadFile" class="small ghost file-action-label">Escolher timbrado</label>
+                      <button id="clearCustomLetterheadBtn" class="small ghost danger" type="button">Remover</button>
+                    </div>
+                    <small id="customLetterheadName" class="template-source-name">Modelo padrão</small>
                   </div>
                 </div>
-                <p class="hint">Capa e timbre são fundos fixos. Ajustes de perspectiva, borda, filtro e rotação só alteram documentos.</p>
                 <details class="font-details">
-              <summary>Fontes do PDF, capa e cabeçalho</summary>
-              <p class="hint">A interface usa fontes sóbrias do sistema/web. Para embutir fonte no PDF com fidelidade absoluta, envie .ttf ou .otf.</p>
+              <summary>
+                <span>Fontes do PDF, capa e cabeçalho</span>
+                <button class="info-tip" type="button" data-tip="As fontes da interface já funcionam sem upload. Envie TTF/OTF apenas se quiser incorporar a fonte ao PDF com maior fidelidade." aria-label="Ajuda sobre fontes">i</button>
+              </summary>
               <label>Fonte principal
                 <select id="fontPresetSelect" class="font-preview-select">
                   <option value="montserrat" style="font-family: Montserrat, Arial, sans-serif;">Montserrat</option>
@@ -372,8 +383,11 @@
                 <label>Margens superior e inferior: <span id="paperMarginYValue">10</span> mm
                   <input id="paperMarginY" type="range" min="0" max="80" value="10" />
                 </label>
-                <label class="checkline"><input id="autoRotateFit" type="checkbox" /> Permitir giro automático para melhorar o encaixe</label>
-                <p class="hint">Sem giro automático, uma página em paisagem permanece legível dentro de uma folha retrato, centralizada horizontal e verticalmente, sem esticar ou cortar.</p>
+                <label class="checkline help-checkline">
+                  <input id="autoRotateFit" type="checkbox" />
+                  <span>Permitir giro automático</span>
+                  <button class="info-tip" type="button" data-tip="Desativado: uma página em paisagem pode permanecer dentro de uma folha retrato, centralizada e sem distorção. Ativado: o app pode girar para aproveitar melhor a área útil." aria-label="Ajuda sobre giro automático">i</button>
+                </label>
               </div>
             </details>
 
@@ -469,7 +483,10 @@
                                   </span>
               </summary>
               <div class="details-body">
-                <p class="hint">Use depois de ajustar aparência, rotação ou margens. A posição dos vértices não será copiada.</p>
+                <div class="compact-help-row">
+                  <span>Aplicar ao restante</span>
+                  <button class="info-tip" type="button" data-tip="Copia aparência, rotação e margens. A perspectiva e a posição individual dos vértices de cada página são preservadas." aria-label="Ajuda sobre aplicar padrão">i</button>
+                </div>
                 <div class="button-grid">
                   <button id="applyToAttachmentBtn" class="small">Ao anexo</button>
                   <button id="applyToDocBtn" class="small">Ao Doc</button>
@@ -577,7 +594,7 @@
             <p class="eyebrow">Versão e informações</p>
             <div class="about-title-line">
               <h2 id="aboutTitle">MVS Editor de PDF</h2>
-              <span class="about-version">v28</span>
+              <span class="about-version">v29</span>
             </div>
           </div>
         </div>
@@ -589,19 +606,19 @@
         </div>
 
         <section class="release-card">
-          <div class="release-title"><strong>Novidades da v28</strong><span>18/09/2026</span></div>
+          <div class="release-title"><strong>Novidades da v29</strong><span>18/09/2026</span></div>
           <ul class="release-list">
-            <li>Modo claro, escuro e sistema com alternância manual independente.</li>
-            <li>Upload unificado: ao clicar na área de envio, escolha arquivos ou câmera.</li>
-            <li>Grade, espaçamentos e responsividade revisados para evitar sobreposições.</li>
-            <li>Interface mais enxuta, com remoção de descrições óbvias.</li>
-            <li>Vértices dos componentes menos arredondados e visual mais sóbrio.</li>
+            <li>Anexos de cada Doc agora podem ser recolhidos separadamente.</li>
+            <li>Descrições longas foram substituídas por ajuda contextual em ícones “i”.</li>
+            <li>Upload de capa e timbrado foi integrado às próprias prévias visuais.</li>
+            <li>Etapa 1 ficou mais compacta para projetos com muitos Docs.</li>
           </ul>
         </section>
 
         <details class="history-card">
           <summary>Histórico de atualizações</summary>
           <div class="history-list">
+            <article><strong>v28 · 18/09/2026</strong><p>Tema manual independente, upload unificado, grid revisado e painel de versão/histórico.</p></article>
             <article><strong>v27 · 18/09/2026</strong><p>Desempenho, novo projeto, capa/timbrado próprios, papel individual e composição de até 6 páginas.</p></article>
             <article><strong>v26 · 14/09/2026</strong><p>Padronização de grid, ícones, câmera e controles.</p></article>
             <article><strong>v25 · 14/09/2026</strong><p>Responsividade geral e primeira integração de câmera.</p></article>
