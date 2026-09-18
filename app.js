@@ -64,7 +64,7 @@ if (window.pdfjsLib) {
 
 const $ = id => document.getElementById(id);
 const els = {
-  installBtn:$("installBtn"), aboutBtn:$("aboutBtn"), aboutModal:$("aboutModal"), closeAboutBtn:$("closeAboutBtn"), copyPixBtn:$("copyPixBtn"), newProjectBtn:$("newProjectBtn"), uploadSourceModal:$("uploadSourceModal"), chooseFilesBtn:$("chooseFilesBtn"), takePhotoBtn:$("takePhotoBtn"), closeUploadSourceBtn:$("closeUploadSourceBtn"),
+  installBtn:$("installBtn"), installModal:$("installModal"), installInstructions:$("installInstructions"), installNativeBtn:$("installNativeBtn"), closeInstallBtn:$("closeInstallBtn"), aboutBtn:$("aboutBtn"), aboutModal:$("aboutModal"), closeAboutBtn:$("closeAboutBtn"), copyPixBtn:$("copyPixBtn"), newProjectBtn:$("newProjectBtn"), uploadSourceModal:$("uploadSourceModal"), chooseFilesBtn:$("chooseFilesBtn"), takePhotoBtn:$("takePhotoBtn"), closeUploadSourceBtn:$("closeUploadSourceBtn"),
   includeCover:$("includeCover"), includeLetterhead:$("includeLetterhead"), globalTemplate:$("globalTemplate"), customCoverFile:$("customCoverFile"), customLetterheadFile:$("customLetterheadFile"), customCoverName:$("customCoverName"), customLetterheadName:$("customLetterheadName"), clearCustomCoverBtn:$("clearCustomCoverBtn"), clearCustomLetterheadBtn:$("clearCustomLetterheadBtn"),
   fontMontserratRegular:$("fontMontserratRegular"), fontMontserratBold:$("fontMontserratBold"), fontLibreRegular:$("fontLibreRegular"),
   addDocBtn:$("addDocBtn"), renumberDocsBtn:$("renumberDocsBtn"), docTabs:$("docTabs"),
@@ -1655,9 +1655,103 @@ function goStep(n){
 }
 
 async function setupPwa(){
-  if("serviceWorker" in navigator){try{await navigator.serviceWorker.register("./sw.js")}catch(e){}}
-  let deferred; window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;els.installBtn.hidden=false;});
-  els.installBtn.onclick=async()=>{if(deferred){deferred.prompt();await deferred.userChoice;deferred=null;els.installBtn.hidden=true;}};
+  const isStandalone=()=>window.matchMedia?.("(display-mode: standalone)")?.matches || window.navigator.standalone===true;
+  const ua=navigator.userAgent||"";
+  const isIOS=/iPad|iPhone|iPod/.test(ua) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  const isAndroid=/Android/i.test(ua);
+  const isSafari=isIOS && /Safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
+  let deferredPrompt=null;
+
+  if("serviceWorker" in navigator){
+    try{
+      const registration=await navigator.serviceWorker.register("./sw.js?v=35",{scope:"./"});
+      await navigator.serviceWorker.ready;
+      registration.update?.().catch(()=>{});
+    }catch(err){
+      console.warn("Service Worker não registrado:",err);
+    }
+  }
+
+  const closeInstall=()=>{
+    if(!els.installModal)return;
+    els.installModal.classList.remove("visible");
+    els.installModal.setAttribute("aria-hidden","true");
+    setTimeout(()=>{els.installModal.hidden=true;},120);
+  };
+
+  const installText=()=>{
+    if(isStandalone())return `<div class="install-state installed"><strong>Aplicativo instalado</strong><p>O MVS Editor de PDF já está sendo executado como aplicativo neste dispositivo.</p></div>`;
+    if(isIOS){
+      if(isSafari){
+        return `<div class="install-steps">
+          <p><strong>No iPhone ou iPad:</strong></p>
+          <ol>
+            <li>Toque no botão <strong>Compartilhar</strong> do Safari.</li>
+            <li>Role o menu e escolha <strong>Adicionar à Tela de Início</strong>.</li>
+            <li>Confirme em <strong>Adicionar</strong>.</li>
+          </ol>
+          <p class="hint">O iOS não exibe a janela automática de instalação usada pelo Android.</p>
+        </div>`;
+      }
+      return `<div class="install-steps"><p>Para instalar no iPhone/iPad, abra esta página no <strong>Safari</strong> e use <strong>Compartilhar → Adicionar à Tela de Início</strong>.</p></div>`;
+    }
+    if(isAndroid){
+      return `<div class="install-steps"><p><strong>No Android:</strong> use <strong>Instalar agora</strong>. Se o navegador não liberar o botão, abra o menu ⋮ do Chrome e escolha <strong>Instalar app</strong> ou <strong>Adicionar à tela inicial</strong>.</p></div>`;
+    }
+    return `<div class="install-steps"><p>Use <strong>Instalar agora</strong> quando disponível. No Chrome/Edge, a opção também pode aparecer no menu do navegador como <strong>Instalar aplicativo</strong>.</p></div>`;
+  };
+
+  const refreshInstallUi=()=>{
+    if(!els.installBtn)return;
+    const standalone=isStandalone();
+    els.installBtn.hidden=standalone;
+    els.installBtn.textContent=standalone?"Instalado":"Instalar app";
+    if(els.installNativeBtn){
+      els.installNativeBtn.hidden=!deferredPrompt || standalone;
+      els.installNativeBtn.disabled=!deferredPrompt || standalone;
+    }
+    if(els.installInstructions)els.installInstructions.innerHTML=installText();
+  };
+
+  const openInstall=()=>{
+    refreshInstallUi();
+    if(!els.installModal)return;
+    els.installModal.hidden=false;
+    els.installModal.setAttribute("aria-hidden","false");
+    requestAnimationFrame(()=>els.installModal.classList.add("visible"));
+  };
+
+  window.addEventListener("beforeinstallprompt",event=>{
+    event.preventDefault();
+    deferredPrompt=event;
+    refreshInstallUi();
+  });
+
+  window.addEventListener("appinstalled",()=>{
+    deferredPrompt=null;
+    refreshInstallUi();
+    setStatus("Aplicativo instalado.");
+    closeInstall();
+  });
+
+  if(els.installBtn)els.installBtn.onclick=openInstall;
+  if(els.closeInstallBtn)els.closeInstallBtn.onclick=closeInstall;
+  if(els.installModal)els.installModal.onclick=event=>{if(event.target===els.installModal)closeInstall();};
+  if(els.installNativeBtn)els.installNativeBtn.onclick=async()=>{
+    if(!deferredPrompt){refreshInstallUi();return;}
+    try{
+      await deferredPrompt.prompt();
+      const choice=await deferredPrompt.userChoice;
+      if(choice?.outcome==="accepted")setStatus("Instalação iniciada.");
+    }catch(err){
+      console.warn("Falha no prompt de instalação:",err);
+    }finally{
+      deferredPrompt=null;
+      refreshInstallUi();
+    }
+  };
+
+  refreshInstallUi();
 }
 
 bind();
