@@ -189,3 +189,16 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Apple Touch Icon usando a nova identidade em alta resolução.
 - Ícone `maskable` de 512 px com margem de segurança maior para Android.
 - Cache do PWA atualizado para `mvs-editor-de-pdf-v31`.
+
+
+## v32 — 18/09/2026
+
+- Logo e favicon regenerados com zona segura e cache-busting.
+- Cabeçalho em largura total, mantendo o conteúdo alinhado ao grid principal.
+- Remoção do texto duplicado "Processamento local" no canto direito.
+- Navegação por etapas, cards e bordas com visual mais discreto.
+- Toolbar dos Docs reorganizada.
+- Botões de prévia alinhados horizontalmente e área de prévia mais compacta.
+- Detecção de perspectiva e montagem A4 com estilo visual menos agressivo.
+- Estado vazio da etapa 3 corrigido para não exibir um iframe gigante sem conteúdo.
+- Cache do PWA atualizado para `mvs-editor-de-pdf-v32`.
