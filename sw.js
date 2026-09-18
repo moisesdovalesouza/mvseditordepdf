@@ -1,4 +1,4 @@
-const CACHE = "mvs-editor-de-pdf-v27";
+const CACHE = "mvs-editor-de-pdf-v28";
 const ASSETS = [
   "./","./index.html","./style.css","./app.js","./manifest.webmanifest",
   "./icons/favicon.ico","./icons/icon-16.png","./icons/icon-32.png","./icons/icon-48.png","./icons/icon-72.png",
