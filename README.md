@@ -223,3 +223,14 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Etapas 1, 2 e 3 compartilham a mesma largura máxima, eixo central e gutter horizontal.
 - Cabeçalho e corpo usam o mesmo sistema de margens em desktop, tablet e celular.
 - Grades internas não podem mais alterar a margem externa do aplicativo.
+
+
+## v35 — 18/09/2026
+
+- Instalação PWA refeita para dispositivos móveis.
+- `Instalar app` fica disponível em celular mesmo quando `beforeinstallprompt` não é suportado.
+- Android/Chrome usa prompt nativo quando disponível e fornece caminho pelo menu quando não estiver.
+- iPhone/iPad mostra instruções próprias para Safari: Compartilhar → Adicionar à Tela de Início.
+- Manifesto ganhou `id`, `prefer_related_applications=false`, `display_override` e referências atualizadas.
+- Service Worker é registrado com versão v35 e cache atualizado.
+- Ícones e Apple Touch Icon recebem cache-busting v35.
