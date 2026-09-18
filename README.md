@@ -213,3 +213,13 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Filtros de imagem e correção de perspectiva continuam rasterizando apenas a página afetada.
 - Novo controle `Preservar PDF nativo`, ativado por padrão.
 - Qualidade Compacto/Padrão/Alta/Máxima passa a afetar imagens e páginas que realmente precisem ser convertidas para bitmap.
+
+
+## v34 — 18/09/2026
+
+- Todos os cards da lateral direita da etapa 2 iniciam recolhidos.
+- Escolha de qualidade corrigida por delegação global de eventos, independente da inicialização dos demais controles.
+- Opção ativa de qualidade ganhou indicação visual clara.
+- Etapas 1, 2 e 3 compartilham a mesma largura máxima, eixo central e gutter horizontal.
+- Cabeçalho e corpo usam o mesmo sistema de margens em desktop, tablet e celular.
+- Grades internas não podem mais alterar a margem externa do aplicativo.
