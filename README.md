@@ -202,3 +202,14 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Detecção de perspectiva e montagem A4 com estilo visual menos agressivo.
 - Estado vazio da etapa 3 corrigido para não exibir um iframe gigante sem conteúdo.
 - Cache do PWA atualizado para `mvs-editor-de-pdf-v32`.
+
+
+## v33 — 18/09/2026
+
+- PDFs importados passam a manter o conteúdo PDF nativo na exportação sempre que a página não usar ajustes que exigem pixels.
+- Texto, vetores e qualidade original deixam de ser rasterizados apenas para montar o arquivo final.
+- Papel, margens, rotação, timbrado, cabeçalho, rodapé e composição de páginas podem usar a página PDF como objeto vetorial.
+- Quando a página estiver absolutamente intacta e no tamanho original, o app tenta copiar a página PDF diretamente para o novo documento.
+- Filtros de imagem e correção de perspectiva continuam rasterizando apenas a página afetada.
+- Novo controle `Preservar PDF nativo`, ativado por padrão.
+- Qualidade Compacto/Padrão/Alta/Máxima passa a afetar imagens e páginas que realmente precisem ser convertidas para bitmap.
