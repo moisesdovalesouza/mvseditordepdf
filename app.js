@@ -58,7 +58,7 @@ const els = {
   fontMontserratRegular:$("fontMontserratRegular"), fontMontserratBold:$("fontMontserratBold"), fontLibreRegular:$("fontLibreRegular"),
   addDocBtn:$("addDocBtn"), renumberDocsBtn:$("renumberDocsBtn"), docTabs:$("docTabs"),
   docNumber:$("docNumber"), docTitle:$("docTitle"), docClassification:$("docClassification"),
-  scanType:$("scanType"), uploadMode:$("uploadMode"), facesPerSheet:$("facesPerSheet"), facesPerSheetWrap:$("facesPerSheetWrap"), scanHint:$("scanHint"), fileInput:$("fileInput"), cameraInput:$("cameraInput"), nestedAttachmentFileInput:$("nestedAttachmentFileInput"), dropzone:$("dropzone"), attachmentViewMode:$("attachmentViewMode"),
+  scanType:$("scanType"), scanInfoBtn:$("scanInfoBtn"), uploadMode:$("uploadMode"), facesPerSheet:$("facesPerSheet"), facesPerSheetWrap:$("facesPerSheetWrap"), scanHint:$("scanHint"), fileInput:$("fileInput"), cameraInput:$("cameraInput"), nestedAttachmentFileInput:$("nestedAttachmentFileInput"), dropzone:$("dropzone"), attachmentViewMode:$("attachmentViewMode"),
   sortImportanceBtn:$("sortImportanceBtn"), sortAlphaBtn:$("sortAlphaBtn"), sortTypeBtn:$("sortTypeBtn"), sortDateBtn:$("sortDateBtn"), attachmentSortSelect:$("attachmentSortSelect"), coverTemplatePreview:$("coverTemplatePreview"), letterheadTemplatePreview:$("letterheadTemplatePreview"),
   attachmentList:$("attachmentList"), removeAttachmentBtn:$("removeAttachmentBtn"), mergeSmallDocsBtn:$("mergeSmallDocsBtn"),
   editDocSelect:$("editDocSelect"), editAttachmentSelect:$("editAttachmentSelect"), attachmentThumbStrip:$("attachmentThumbStrip"),
@@ -91,7 +91,7 @@ function currentAttachment(){ return currentDoc()?.attachments.find(a=>a.id===st
 function currentPage(){ return currentAttachment()?.pages.find(p=>p.id===state.activePageId) || null; }
 
 function createDoc(initial={}){
-  return { id:uid(), number:"", title:"", classification:"", coverContentMode:"list", coverDescription:"", attachments:[], ...initial };
+  return { id:uid(), number:"", title:"", classification:"", coverContentMode:"list", coverDescription:"", attachmentsOpen:true, attachments:[], ...initial };
 }
 function createAttachment(initial={}){
   return {id:uid(),fileName:"",title:"",classification:"",showInCover:true,pages:[],createdAt:Date.now(),fileType:"",layoutFaces:1,sheetGroups:[],...initial};
@@ -167,6 +167,7 @@ function renderDocTabs(){
   state.docs.forEach(doc=>{
     if(!doc.coverContentMode) doc.coverContentMode="list";
     if(doc.coverDescription==null) doc.coverDescription="";
+    if(doc.attachmentsOpen==null) doc.attachmentsOpen=true;
     const details = document.createElement("details");
     details.className = "doc-tab doc-index-card" + (doc.id===state.activeDocId ? " active" : "");
     details.open = doc.id===state.activeDocId;
@@ -176,7 +177,7 @@ function renderDocTabs(){
     details.innerHTML = `
       <summary class="doc-index-summary">
         <span class="doc-grip" title="Arraste para organizar">⋮⋮</span>
-        <span class="doc-summary-text"><strong>${esc(titleLine)}</strong><small>${doc.attachments.length} anexo(s). Este é o único local de edição do Doc na etapa 1.</small></span>
+        <span class="doc-summary-text"><strong>${esc(titleLine)}</strong><small>${doc.attachments.length} anexo(s)</small></span>
         <button class="small ghost danger doc-remove" type="button" title="Excluir este Doc">Excluir</button>
       </summary>
       <div class="doc-index-body">
@@ -195,10 +196,13 @@ function renderDocTabs(){
           <label class="cover-description-field" ${doc.coverContentMode==="description"?"":"hidden"}>Descrição breve
             <textarea class="cover-description" rows="3" maxlength="360" placeholder="Descreva brevemente o conteúdo deste Doc.">${esc(doc.coverDescription || "")}</textarea>
           </label>
-          <p class="hint">A capa usa apenas uma opção: lista de anexos ou descrição. Nunca as duas ao mesmo tempo.</p>
+          <button class="info-tip cover-mode-help" type="button" data-tip="A capa usa apenas uma opção por Doc: lista de anexos ou descrição breve. Nunca as duas ao mesmo tempo." aria-label="Ajuda sobre conteúdo da capa">i</button>
         </div>
-        <div class="doc-index-attachments">
-          <div class="doc-index-attachments-title"><strong>Anexos deste Doc</strong><small>Edite aqui título, classificação e capa.</small></div>
+        <details class="doc-index-attachments attachments-collapse" ${doc.attachmentsOpen ? "open" : ""}>
+          <summary class="attachments-collapse-summary">
+            <strong>Anexos</strong>
+            <span class="attachments-count">${doc.attachments.length}</span>
+          </summary>
           <div class="doc-index-attachment-list">
             ${doc.attachments.length ? doc.attachments.map(att=>`
               <div class="doc-index-attachment" data-attachment-id="${att.id}">
@@ -217,6 +221,8 @@ function renderDocTabs(){
     numberInput.oninput=()=>{doc.number=numberInput.value;}; titleInput.oninput=()=>{doc.title=titleInput.value;}; classSelect.onchange=()=>{doc.classification=classSelect.value;};
     const mode=details.querySelector(".cover-content-mode"), descField=details.querySelector(".cover-description-field"), desc=details.querySelector(".cover-description");
     mode.onchange=()=>{doc.coverContentMode=mode.value; descField.hidden=mode.value!=="description";}; desc.oninput=()=>{doc.coverDescription=desc.value;};
+    const attCollapse=details.querySelector(".attachments-collapse");
+    if(attCollapse) attCollapse.addEventListener("toggle",()=>{doc.attachmentsOpen=attCollapse.open;});
     details.querySelectorAll(".doc-index-attachment").forEach(row=>{
       const att=doc.attachments.find(a=>a.id===row.dataset.attachmentId); if(!att)return;
       row.querySelector(".select-index-attachment").onclick=()=>{state.activeDocId=doc.id;selectAttachment(att.id);};
@@ -283,7 +289,7 @@ function renderScanHint(){
   if(compatible && els.uploadMode?.value === "new-attachment") els.uploadMode.value = "group-selection";
   if(!compatible && els.uploadMode?.value === "group-selection") els.uploadMode.value = "new-attachment";
   if (els.scanType.value === "photo-grid" && els.facesPerSheet && !["2","4","6"].includes(els.facesPerSheet.value)) els.facesPerSheet.value = "4";
-  els.scanHint.textContent = map[els.scanType.value] || "";
+  const hint=map[els.scanType.value] || ""; if(els.scanHint) els.scanHint.textContent=hint; if(els.scanInfoBtn) els.scanInfoBtn.dataset.tip=hint || "Escolha o tipo do documento para adaptar a montagem.";
 }
 
 function renderAttachments(){
@@ -1407,6 +1413,11 @@ function bind(){
     showPrecisionLoupe(e.clientX,e.clientY,x,y);
   };
   window.onpointerup=()=>{if(state.drag){state.drag=null;hidePrecisionLoupe();renderPreview();renderPageFilmstrip();}};
+  document.addEventListener("click",e=>{
+    const tip=e.target.closest?.(".info-tip");
+    document.querySelectorAll(".info-tip.open").forEach(el=>{if(el!==tip)el.classList.remove("open");});
+    if(tip){e.preventDefault();e.stopPropagation();tip.classList.toggle("open");}
+  });
   setupPwa();
   // Efeito de luz interativo desativado para reduzir uso de CPU/GPU.
 }
