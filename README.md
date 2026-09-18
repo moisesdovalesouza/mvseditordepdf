@@ -149,3 +149,14 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Papel individual por página ou por anexo, com margens horizontais/verticais e opção de giro automático.
 - Seleção de 2 a 6 páginas para compor uma única folha sem distorção.
 - Revisão de espaçamentos, botões e barras de ação para evitar aproximações e sobreposição.
+
+
+## v28 — 18/09/2026
+
+- Alternância manual de tema foi desacoplada do restante do aplicativo e passa a ter prioridade real sobre o tema do sistema.
+- Botão `Versão 28` abre versão, data de atualização, criador, novidades, histórico, redes sociais e chave Pix.
+- Área de upload virou ponto único: ao clicar, o usuário escolhe entre arquivos ou câmera.
+- Removidas descrições óbvias para reduzir ruído visual.
+- Grid revisado em múltiplos de 4 px e componentes com cantos menos arredondados.
+- Cabeçalho, rodapés e controles deixaram de usar posicionamentos que podiam encobrir funções.
+- Menus, cards, ações e colunas ganharam `min-width: 0`, quebra responsiva e largura automática para evitar sobreposição.
