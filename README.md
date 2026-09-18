@@ -135,3 +135,17 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - O input de câmera deixou de usar `hidden`, pois alguns navegadores móveis bloqueiam abertura de câmera quando o campo está invisível de forma rígida.
 - Ajuste responsivo revisado para desktop, tablet e celular.
 - Botão de montagem A4 padronizado dentro da grade de ações.
+
+
+## v27
+
+- Redução de consumo: renderização pesada limitada à etapa visível, prévia reduzida a 1200 px, PDF importado em escala 1.30 e imagens limitadas a 1800 px; efeito de luz por ponteiro desativado.
+- Novo projeto agora restaura configurações do documento e retorna à etapa 1.
+- Tema Sistema/Claro/Escuro refeito com alternância manual e persistência.
+- Modal Sobre com função, criador Moisés do Vale Souza e redes sociais.
+- Capas/timbrados mais robustos, com suporte a fundo próprio em PDF/JPG/PNG.
+- Etapa 1 passa a ter um único ponto de edição de Docs/anexos: Docs do projeto.
+- Capa: escolha exclusiva entre lista de anexos ou descrição breve do Doc.
+- Papel individual por página ou por anexo, com margens horizontais/verticais e opção de giro automático.
+- Seleção de 2 a 6 páginas para compor uma única folha sem distorção.
+- Revisão de espaçamentos, botões e barras de ação para evitar aproximações e sobreposição.
