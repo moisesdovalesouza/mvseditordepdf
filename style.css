@@ -3232,3 +3232,24 @@ button.primary.next,#downloadPdfBtn{background:var(--action)!important;color:var
   .docs-toolbar{width:100%;display:grid;grid-template-columns:1fr 1fr}
   .export-grid{grid-template-columns:1fr!important}
 }
+
+
+/* v33 — preservação de PDF nativo */
+.native-pdf-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  align-items:center;
+  margin:10px 0 12px;
+  padding:9px 10px;
+  border:1px solid var(--border-soft);
+  border-radius:4px;
+  background:color-mix(in srgb,var(--success-soft) 42%,var(--surface-soft));
+}
+.native-pdf-toggle{
+  margin:0 !important;
+  min-width:0;
+}
+.native-pdf-toggle span{
+  font-weight:850;
+}
