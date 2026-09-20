@@ -244,3 +244,14 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Favicon e Apple Touch Icon usam os novos assets.
 - Service Worker atualizado para cache `mvs-editor-de-pdf-v36-icons`.
 - Instalações já existentes no Windows podem exigir uma reinstalação única para reconstruir o atalho e o ícone da barra de tarefas.
+
+
+## v37 — 20/09/2026
+
+- Logo da interface separada dos ícones de instalação.
+- Logo interna com fundo transparente e variantes automáticas para tema claro e escuro.
+- Removidos os badges `01`, `UP` e `DOC` da etapa 1.
+- Novos ícones opacos e com zona segura para Windows/Chrome PWA, Android e Apple Touch Icon.
+- Manifesto passa a usar caminhos absolutos e nomes exclusivos da v37.
+- Vercel recebe cabeçalhos específicos para `manifest.webmanifest` e `sw.js`.
+- Cache do Service Worker atualizado para `mvs-editor-de-pdf-v37-icons`.
