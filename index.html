@@ -43,7 +43,7 @@
       if(persist){try{localStorage.setItem(KEY,choice)}catch(_){}}
       setButtons(choice);
       document.querySelectorAll('meta[name="theme-color"]').forEach(meta=>{
-        meta.setAttribute("content",resolved==="dark"?"#151c29":"#f7f3e9");
+        meta.setAttribute("content",resolved==="dark"?"#0f1722":"#f5f7fa");
       });
       return {choice,resolved};
     }
@@ -64,6 +64,7 @@
   })();
   </script>
   <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./theme-v38.css?v=38" />
 </head>
 <body>
   <div class="app-ambient" aria-hidden="true"></div>
@@ -86,7 +87,7 @@
           <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">Claro</button>
           <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="false">Escuro</button>
         </div>
-        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 37</button>
+        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 38</button>
         <button id="installBtn" class="ghost install-cta" hidden>Instalar app</button>
       </div>
       </div>
@@ -671,7 +672,7 @@
             <p class="eyebrow">Versão e informações</p>
             <div class="about-title-line">
               <h2 id="aboutTitle">MVS Editor de PDF</h2>
-              <span class="about-version">v37</span>
+              <span class="about-version">v38</span>
             </div>
           </div>
         </div>
@@ -683,18 +684,19 @@
         </div>
 
         <section class="release-card">
-          <div class="release-title"><strong>Novidades da v37</strong><span>20/09/2026</span></div>
+          <div class="release-title"><strong>Novidades da v38</strong><span>20/09/2026</span></div>
           <ul class="release-list">
-            <li>Logo interna com fundo transparente e adaptação automática aos temas claro e escuro.</li>
-            <li>Indicadores 01, UP e DOC removidos da etapa 1 para uniformizar a interface.</li>
-            <li>Ícones de instalação separados da logo da interface e refeitos para Windows, Android e iOS.</li>
-            <li>Manifesto atualizado com novos arquivos de ícone exclusivos da v37.</li>
+            <li>Modo claro e escuro revisados com contraste consistente em todos os controles.</li>
+            <li>Campos, placeholders, botões desabilitados, menus e estados ativos passam a ter cores próprias por tema.</li>
+            <li>Cards, tooltips, modais, prévias e estados de erro/sucesso foram harmonizados.</li>
+            <li>Tema Sistema agora usa exatamente a mesma paleta final dos modos Claro e Escuro.</li>
           </ul>
         </section>
 
         <details class="history-card">
           <summary>Histórico de atualizações</summary>
           <div class="history-list">
+            <article><strong>v37 · 20/09/2026</strong><p>Identidade transparente e ícones multiplataforma revisados.</p></article>
             <article><strong>v36 · 18/09/2026</strong><p>Correções de identidade, favicon e ícones de instalação.</p></article>
             <article><strong>v35 · 18/09/2026</strong><p>Fluxo de instalação PWA para Android e iPhone/iPad.</p></article>
             <article><strong>v34 · 18/09/2026</strong><p>Cards recolhidos, qualidade corrigida e eixo horizontal unificado.</p></article>
