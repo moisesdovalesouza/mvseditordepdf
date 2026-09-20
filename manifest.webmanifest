@@ -1,35 +1,41 @@
 {
+  "id": "/",
   "name": "MVS Editor de PDF",
   "short_name": "MVS PDF",
   "description": "Editor jurídico de PDF para organizar, ajustar, preservar e exportar documentos.",
-  "start_url": "./?pwa=v36",
-  "scope": "./",
+  "start_url": "/?pwa=v37",
+  "scope": "/",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "background_color": "#06294b",
   "theme_color": "#06294b",
   "orientation": "any",
+  "prefer_related_applications": false,
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
-      "src": "icons/app-icon-v36-192.png",
+      "src": "/icons/mvs-app-v37-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/app-icon-v36-512.png",
+      "src": "/icons/mvs-app-v37-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/icons/mvs-app-v37-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ],
-  "id": "./",
-  "display_override": [
-    "standalone",
-    "minimal-ui"
-  ],
-  "prefer_related_applications": false,
-  "categories": [
-    "productivity",
-    "utilities"
   ]
 }
