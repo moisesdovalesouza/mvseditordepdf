@@ -1,0 +1,152 @@
+/* v38 — sistema de contraste unificado para claro/escuro */
+html[data-resolved-theme="light"],
+html.force-light{
+  color-scheme:light !important;
+  --background:#f5f7fa !important;
+  --background-soft:#edf2f7 !important;
+  --foreground:#162233 !important;
+  --card:#ffffff !important;
+  --card-solid:#ffffff !important;
+  --surface-glass:rgba(255,255,255,.94) !important;
+  --surface-soft:#f1f5f9 !important;
+  --primary:#0b4b78 !important;
+  --primary-2:#0e5d91 !important;
+  --primary-foreground:#ffffff !important;
+  --secondary:#e9eff5 !important;
+  --secondary-foreground:#1b2a3a !important;
+  --muted:#e8edf3 !important;
+  --muted-foreground:#536274 !important;
+  --accent:#dceef8 !important;
+  --accent-foreground:#083b61 !important;
+  --action:#c94439 !important;
+  --action-2:#b9362e !important;
+  --action-foreground:#ffffff !important;
+  --destructive:#a8322b !important;
+  --border:#9dabb9 !important;
+  --border-soft:#cbd5df !important;
+  --input:#8fa0b2 !important;
+  --ring:rgba(11,75,120,.24) !important;
+  --gold:#9c6b14 !important;
+  --gold-soft:#f5e7c5 !important;
+  --gold-foreground:#5c3c08 !important;
+  --success:#176b51 !important;
+  --success-soft:#d9efe7 !important;
+  --document-line:#c7d0da !important;
+  --control-bg:#ffffff;
+  --control-bg-hover:#f7fafc;
+  --control-border:#8fa0b2;
+  --control-placeholder:#68788a;
+  --disabled-bg:#e8edf2;
+  --disabled-text:#657384;
+  --danger-soft:#fbe7e5;
+  --focus-outline:#0b4b78;
+  --canvas-bg:#e8eef4;
+  --tooltip-bg:#102238;
+  --tooltip-fg:#ffffff;
+  --grid-line:rgba(22,34,51,.055);
+  --shadow:0 12px 30px -24px rgba(22,34,51,.35) !important;
+  --shadow-soft:0 8px 20px -18px rgba(22,34,51,.30) !important;
+}
+html[data-resolved-theme="dark"],
+html.force-dark{
+  color-scheme:dark !important;
+  --background:#0f1722 !important;
+  --background-soft:#111f2d !important;
+  --foreground:#f5f7fa !important;
+  --card:#182333 !important;
+  --card-solid:#182333 !important;
+  --surface-glass:rgba(24,35,51,.96) !important;
+  --surface-soft:#202f42 !important;
+  --primary:#8dd0ff !important;
+  --primary-2:#69bdf5 !important;
+  --primary-foreground:#0b1723 !important;
+  --secondary:#253348 !important;
+  --secondary-foreground:#f5f7fa !important;
+  --muted:#2b3a4d !important;
+  --muted-foreground:#b8c4d2 !important;
+  --accent:#233f55 !important;
+  --accent-foreground:#e9f7ff !important;
+  --action:#ff7a70 !important;
+  --action-2:#ef665c !important;
+  --action-foreground:#21100f !important;
+  --destructive:#ff958d !important;
+  --border:#52657a !important;
+  --border-soft:#34465a !important;
+  --input:#5a6f85 !important;
+  --ring:rgba(141,208,255,.34) !important;
+  --gold:#e8bf65 !important;
+  --gold-soft:#493a1d !important;
+  --gold-foreground:#ffe8ae !important;
+  --success:#7fdbba !important;
+  --success-soft:#173d33 !important;
+  --document-line:#5a697a !important;
+  --control-bg:#121d2a;
+  --control-bg-hover:#172535;
+  --control-border:#52657a;
+  --control-placeholder:#9aabbd;
+  --disabled-bg:#1d2938;
+  --disabled-text:#8796a8;
+  --danger-soft:#462522;
+  --focus-outline:#8dd0ff;
+  --canvas-bg:#24364b;
+  --tooltip-bg:#f5f7fa;
+  --tooltip-fg:#101923;
+  --grid-line:rgba(245,247,250,.045);
+  --shadow:0 16px 38px -26px rgba(0,0,0,.82) !important;
+  --shadow-soft:0 10px 26px -20px rgba(0,0,0,.72) !important;
+}
+body{color:var(--foreground)!important;background:linear-gradient(180deg,var(--background),var(--background-soft))!important}
+body::before{background:linear-gradient(90deg,var(--grid-line) 1px,transparent 1px),linear-gradient(180deg,var(--grid-line) 1px,transparent 1px)!important;opacity:1!important}
+.app-ambient{opacity:.28!important}
+.app-header{background:color-mix(in srgb,var(--card-solid) 96%,transparent)!important;border-bottom-color:var(--border-soft)!important}
+.card,.doc-index-card,.collapsible-card,.template-preview-card,.attachment-card,.page-card,.thumb-card,.apply-panel,.confirm-dialog,.release-card,.creator-card,.history-card,.install-instructions,#pdfFrame{background:var(--card-solid)!important;color:var(--foreground)!important;border-color:var(--border-soft)!important}
+input[type="text"],input[type="search"],input[type="number"],input[type="email"],input[type="url"],input[type="file"],select,textarea{background:var(--control-bg)!important;color:var(--foreground)!important;border-color:var(--control-border)!important;box-shadow:none!important}
+input::placeholder,textarea::placeholder{color:var(--control-placeholder)!important;opacity:1!important}
+select option{background:var(--card-solid)!important;color:var(--foreground)!important}
+input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--focus-outline)!important;outline-offset:2px!important;box-shadow:0 0 0 3px var(--ring)!important}
+input:disabled,select:disabled,textarea:disabled,button:disabled{opacity:1!important;background:var(--disabled-bg)!important;color:var(--disabled-text)!important;border-color:var(--border-soft)!important;cursor:not-allowed!important}
+input[type="checkbox"],input[type="radio"],input[type="range"]{accent-color:var(--primary)!important}
+button{color:var(--action-foreground)!important;background:var(--action)!important;border-color:color-mix(in srgb,var(--action) 72%,var(--border))!important}
+button:hover:not(:disabled){background:var(--action-2)!important}
+button.ghost,button.small:not(.primary):not(.danger),#renumberDocsBtn,#downloadPreviewBtn,.preview-link,.file-action-label{color:var(--secondary-foreground)!important;background:var(--secondary)!important;border-color:var(--border)!important}
+button.ghost:hover:not(:disabled),button.small:not(.primary):not(.danger):hover:not(:disabled),.preview-link:hover,.file-action-label:hover{background:color-mix(in srgb,var(--secondary) 82%,var(--primary) 18%)!important;color:var(--foreground)!important}
+button.danger,#newProjectBtn,.doc-remove,.remove-attachment,#removePageBtn{color:var(--destructive)!important;background:var(--danger-soft)!important;border-color:color-mix(in srgb,var(--destructive) 45%,var(--border))!important}
+button.danger:hover:not(:disabled),#newProjectBtn:hover:not(:disabled),.doc-remove:hover:not(:disabled),.remove-attachment:hover:not(:disabled),#removePageBtn:hover:not(:disabled){background:color-mix(in srgb,var(--danger-soft) 78%,var(--destructive) 22%)!important}
+a{color:var(--primary)}
+.theme-switch{background:var(--secondary)!important;border-color:var(--border)!important}
+.theme-option{background:transparent!important;color:var(--muted-foreground)!important}
+.theme-option:hover{color:var(--foreground)!important;background:var(--control-bg-hover)!important}
+.theme-option.active{color:var(--primary)!important;background:var(--card-solid)!important;border:1px solid var(--border-soft)!important;box-shadow:none!important}
+.steps{background:var(--card-solid)!important;border-color:var(--border-soft)!important}
+.step{color:var(--muted-foreground)!important;background:transparent!important}
+.step:hover{color:var(--foreground)!important;background:var(--secondary)!important}
+.step span{background:var(--control-bg)!important;color:var(--primary)!important;border-color:var(--border-soft)!important}
+.step.active{color:var(--primary-foreground)!important;background:var(--primary)!important;border-color:var(--primary)!important}
+.step.active span{color:var(--primary-foreground)!important;background:color-mix(in srgb,var(--primary-foreground) 14%,transparent)!important;border-color:color-mix(in srgb,var(--primary-foreground) 34%,transparent)!important}
+details,.attachments-collapse,.doc-index-attachments,.quality-estimate,.native-pdf-row,.hint-box,.install-instructions{background:var(--surface-soft)!important;color:var(--foreground)!important;border-color:var(--border-soft)!important}
+details summary,.attachments-collapse-summary,.collapsible-card>summary{color:var(--foreground)!important}
+.doc-tab.active,.attachment-card.active,.page-card.active,.thumb-card.active{background:var(--accent)!important;color:var(--accent-foreground)!important;border-color:var(--primary)!important}
+.doc-tab small,.attachment-card small,.page-card small,.thumb-card small,.hint,.drop-help,.eyebrow,.template-source-name,.quality-option small,.quality-estimate>span{color:var(--muted-foreground)!important}
+.dropzone{background:var(--surface-soft)!important;color:var(--foreground)!important;border-color:var(--control-border)!important}
+.dropzone:hover,.dropzone.dragover{background:var(--accent)!important;color:var(--accent-foreground)!important;border-color:var(--primary)!important}
+.drop-title{color:var(--foreground)!important}.drop-meta{color:var(--primary)!important}
+.canvas-stage,.preview-export #previewEmpty{background:var(--canvas-bg)!important;color:var(--muted-foreground)!important;border-color:var(--border-soft)!important}
+.quality-option{background:var(--control-bg)!important;color:var(--foreground)!important;border-color:var(--control-border)!important}
+.quality-option:hover{background:var(--control-bg-hover)!important}
+.quality-option.active{background:var(--accent)!important;color:var(--accent-foreground)!important;border-color:var(--primary)!important}
+.quality-option.active small{color:var(--accent-foreground)!important;opacity:.8}
+.quality-summary-badge{background:var(--accent)!important;color:var(--accent-foreground)!important;border-color:var(--primary)!important}
+.info-tip{background:var(--control-bg)!important;color:var(--muted-foreground)!important;border-color:var(--border)!important}
+.info-tip:hover,.info-tip:focus-visible,.info-tip.open{background:var(--accent)!important;color:var(--accent-foreground)!important;border-color:var(--primary)!important}
+.info-tip::after{background:var(--tooltip-bg)!important;color:var(--tooltip-fg)!important;border-color:transparent!important}
+.modal-backdrop{background:rgba(5,10,18,.62)!important}
+.status{background:var(--card-solid)!important;color:var(--foreground)!important;border-color:var(--border)!important}
+.no-distort-rule,.install-state.installed{color:var(--success)!important;background:var(--success-soft)!important}
+.apply-panel-card,.native-pdf-row{border-color:color-mix(in srgb,var(--gold) 38%,var(--border-soft))!important}
+.drag{background:var(--primary)!important;border-color:var(--card-solid)!important}
+#quadPolygon{stroke:var(--primary)!important}
+hr{border-top-color:var(--border-soft)!important}
+html[data-resolved-theme="light"] .brand-logo-light{opacity:1!important}
+html[data-resolved-theme="light"] .brand-logo-dark{opacity:0!important}
+html[data-resolved-theme="dark"] .brand-logo-light{opacity:0!important}
+html[data-resolved-theme="dark"] .brand-logo-dark{opacity:1!important}
