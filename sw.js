@@ -1,6 +1,6 @@
-const CACHE = "mvs-editor-de-pdf-v37-icons";
+const CACHE = "mvs-editor-de-pdf-v38-theme";
 const ASSETS = [
-  "./","./?pwa=v37","./index.html","./style.css","./app.js","./manifest.webmanifest","./browserconfig.xml",
+  "./","./?pwa=v38","./index.html","./style.css","./theme-v38.css","./app.js","./manifest.webmanifest","./browserconfig.xml",
   "./icons/brand-ui-light-v37.png","./icons/brand-ui-dark-v37.png",
   "./icons/favicon-v37-64.png",
   "./icons/mvs-app-v37-192.png","./icons/mvs-app-v37-512.png","./icons/mvs-app-v37-maskable-512.png",
