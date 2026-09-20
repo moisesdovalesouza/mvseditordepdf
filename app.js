@@ -1664,7 +1664,7 @@ async function setupPwa(){
 
   if("serviceWorker" in navigator){
     try{
-      const registration=await navigator.serviceWorker.register("./sw.js?v=35",{scope:"./"});
+      const registration=await navigator.serviceWorker.register("./sw.js?v=37",{scope:"./"});
       await navigator.serviceWorker.ready;
       registration.update?.().catch(()=>{});
     }catch(err){
