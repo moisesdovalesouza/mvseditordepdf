@@ -255,3 +255,12 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Manifesto passa a usar caminhos absolutos e nomes exclusivos da v37.
 - Vercel recebe cabeçalhos específicos para `manifest.webmanifest` e `sw.js`.
 - Cache do Service Worker atualizado para `mvs-editor-de-pdf-v37-icons`.
+
+
+## v38 — 20/09/2026
+
+- Sistema de cores claro/escuro centralizado por `data-resolved-theme`.
+- Paletas revisadas com contraste forte para texto principal e secundário.
+- Campos, placeholders, selects, opções, botões desabilitados e focos receberam estados específicos por tema.
+- Botões de perigo, cards selecionados, qualidade, tooltips, modais, status, upload e prévias foram harmonizados.
+- Tema `Sistema` passa a compartilhar exatamente a paleta final de Claro/Escuro.
