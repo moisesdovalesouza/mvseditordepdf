@@ -3400,3 +3400,77 @@ html[data-theme="dark"] .app-icon-logo{
     flex-basis:44px !important;
   }
 }
+
+
+/* v37 — identidade transparente e etapa 1 sem badges */
+.brand-logo-wrap{
+  position:relative;
+  display:block;
+  width:48px;
+  height:48px;
+  min-width:48px;
+  flex:0 0 48px;
+  overflow:visible;
+}
+.brand-logo-wrap .brand-logo{
+  position:absolute !important;
+  inset:0 !important;
+  display:block !important;
+  width:48px !important;
+  height:48px !important;
+  min-width:48px !important;
+  min-height:48px !important;
+  max-width:48px !important;
+  max-height:48px !important;
+  object-fit:contain !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  transition:opacity .12s ease;
+}
+.brand-logo-light{opacity:1 !important}
+.brand-logo-dark{opacity:0 !important}
+html[data-resolved-theme="dark"] .brand-logo-light,
+html.force-dark .brand-logo-light{opacity:0 !important}
+html[data-resolved-theme="dark"] .brand-logo-dark,
+html.force-dark .brand-logo-dark{opacity:1 !important}
+html[data-resolved-theme="light"] .brand-logo-light,
+html.force-light .brand-logo-light{opacity:1 !important}
+html[data-resolved-theme="light"] .brand-logo-dark,
+html.force-light .brand-logo-dark{opacity:0 !important}
+#step1 .step-section-heading{
+  grid-template-columns:1fr !important;
+  gap:0 !important;
+}
+#step1 .upload-card .card-title > div,
+#step1 .docs-card .card-title > div{
+  display:block !important;
+}
+#step1 .upload-card .card-title h2,
+#step1 .docs-card .card-title h2{
+  margin:0 !important;
+}
+#step1 .icon-step,
+#step1 .icon-upload,
+#step1 .icon-docs{
+  display:none !important;
+}
+@media(max-width:820px){
+  .brand-logo-wrap{
+    width:44px;
+    height:44px;
+    min-width:44px;
+    flex-basis:44px;
+  }
+  .brand-logo-wrap .brand-logo{
+    width:44px !important;
+    height:44px !important;
+    min-width:44px !important;
+    min-height:44px !important;
+    max-width:44px !important;
+    max-height:44px !important;
+  }
+}
