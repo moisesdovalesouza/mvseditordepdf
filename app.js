@@ -78,7 +78,7 @@ const els = {
   pageFilmstrip:$("pageFilmstrip"), removePageBtn:$("removePageBtn"), movePageUpBtn:$("movePageUpBtn"), movePageDownBtn:$("movePageDownBtn"), composeSelectedPagesBtn:$("composeSelectedPagesBtn"), clearPageSelectionBtn:$("clearPageSelectionBtn"), clearCompositionsBtn:$("clearCompositionsBtn"), pageSelectionCount:$("pageSelectionCount"),
   selectedPageInfo:$("selectedPageInfo"), previewCanvas:$("previewCanvas"), overlay:$("overlay"), quadPolygon:$("quadPolygon"), emptyCanvas:$("emptyCanvas"), precisionLoupe:$("precisionLoupe"), precisionLoupeCanvas:$("precisionLoupeCanvas"), precisionLoupeText:$("precisionLoupeText"),
   showCorrectedPreview:$("showCorrectedPreview"), previewModeFinal:$("previewModeFinal"), previewModeEdit:$("previewModeEdit"), autoCornersBtn:$("autoCornersBtn"), resetCornersBtn:$("resetCornersBtn"), rotateLeftBtn:$("rotateLeftBtn"), rotateRightBtn:$("rotateRightBtn"),
-  paperScope:$("paperScope"), paperSize:$("paperSize"), orientation:$("orientation"), pageRotation:$("pageRotation"), paperMargin:$("paperMargin"), paperMarginValue:$("paperMarginValue"), paperMarginY:$("paperMarginY"), paperMarginYValue:$("paperMarginYValue"), autoRotateFit:$("autoRotateFit"), paperOriginalNotice:$("paperOriginalNotice"), paperLayoutCard:$("paperLayoutCard"), paperEffectiveInfo:$("paperEffectiveInfo"), paperEffectiveInfo:$("paperEffectiveInfo"),
+  paperScope:$("paperScope"), paperSize:$("paperSize"), orientation:$("orientation"), pageRotation:$("pageRotation"), paperMargin:$("paperMargin"), paperMarginValue:$("paperMarginValue"), paperMarginY:$("paperMarginY"), paperMarginYValue:$("paperMarginYValue"), autoRotateFit:$("autoRotateFit"), paperOriginalNotice:$("paperOriginalNotice"), paperLayoutCard:$("paperLayoutCard"), paperEffectiveInfo:$("paperEffectiveInfo"),
   perspectiveEnabled:$("perspectiveEnabled"), edgeTop:$("edgeTop"), edgeRight:$("edgeRight"), edgeBottom:$("edgeBottom"), edgeLeft:$("edgeLeft"),
   edgeTopValue:$("edgeTopValue"), edgeRightValue:$("edgeRightValue"), edgeBottomValue:$("edgeBottomValue"), edgeLeftValue:$("edgeLeftValue"),
   brightness:$("brightness"), contrast:$("contrast"), saturation:$("saturation"), grayscale:$("grayscale"), threshold:$("threshold"),
@@ -92,17 +92,13 @@ const els = {
   status:$("status")
 };
 
-// quality-choice-delegation-v34
+// quality-choice-delegation-v47
 document.addEventListener("click",event=>{
   const btn=event.target.closest?.(".quality-option");
   if(!btn)return;
   event.preventDefault();
-  event.stopPropagation();
   const choice=btn.dataset.quality;
-  if(!QUALITY_PRESETS[choice])return;
-  state.pdfQuality=choice;
-  updateQualityUi();
-  if(document.getElementById("step3")?.classList.contains("active"))refreshStep3Preview(false);
+  setPdfQuality(choice);
 });
 
 
@@ -1125,6 +1121,48 @@ function estimatePdfBytes(){
   return {low:bytes*.70,high:bytes*1.38,mid:bytes};
 }
 
+function updateQualityUi(){
+  const preset=qualityPreset();
+  document.querySelectorAll(".quality-option").forEach(btn=>{
+    const active=btn.dataset.quality===state.pdfQuality;
+    btn.classList.toggle("active",active);
+    btn.setAttribute("aria-checked",String(active));
+    btn.setAttribute("aria-pressed",String(active));
+    btn.tabIndex=active?0:-1;
+  });
+  if(els.qualitySummaryBadge){
+    els.qualitySummaryBadge.textContent=preset.label;
+    els.qualitySummaryBadge.dataset.quality=state.pdfQuality;
+  }
+  if(els.qualityMeterFill){
+    els.qualityMeterFill.style.width=(preset.meter||0)+"%";
+    els.qualityMeterFill.setAttribute("aria-valuenow",String(preset.meter||0));
+  }
+  const estimate=estimatePdfBytes();
+  if(els.pdfSizeEstimate){
+    if(!estimate) els.pdfSizeEstimate.textContent="Sem páginas";
+    else{
+      const low=formatBytes(estimate.low),high=formatBytes(estimate.high);
+      els.pdfSizeEstimate.textContent=low===high?low:low+" – "+high;
+      els.pdfSizeEstimate.title="Estimativa central: "+formatBytes(estimate.mid);
+    }
+  }
+  const card=els.qualitySummaryBadge?.closest?.(".pdf-quality-card");
+  if(card){
+    card.dataset.quality=state.pdfQuality;
+    card.classList.toggle("native-preserve-active",!!els.preservePdfNative?.checked);
+  }
+}
+
+function setPdfQuality(choice,{announce=true}={}){
+  if(!QUALITY_PRESETS[choice])return;
+  const changed=state.pdfQuality!==choice;
+  state.pdfQuality=choice;
+  updateQualityUi();
+  if(document.getElementById("step3")?.classList.contains("active"))refreshStep3Preview(false);
+  if(changed&&announce)setStatus("Qualidade do PDF: "+QUALITY_PRESETS[choice].label+".");
+}
+
 async function backgroundFileToData(file){
   if(!file)return null;
   if(file.type==="application/pdf"||file.name.toLowerCase().endsWith(".pdf")){
@@ -1443,6 +1481,20 @@ function applyAdjust(scope){
 }
 
 function bind(){
+  // quality-options-keyboard-v47
+  const qualityButtons=[...document.querySelectorAll(".quality-option")];
+  qualityButtons.forEach((btn,idx)=>btn.addEventListener("keydown",e=>{
+    if(!["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Home","End"].includes(e.key))return;
+    e.preventDefault();
+    let next=idx;
+    if(e.key==="Home")next=0;
+    else if(e.key==="End")next=qualityButtons.length-1;
+    else if(e.key==="ArrowRight"||e.key==="ArrowDown")next=(idx+1)%qualityButtons.length;
+    else next=(idx-1+qualityButtons.length)%qualityButtons.length;
+    const target=qualityButtons[next];
+    setPdfQuality(target.dataset.quality);
+    target.focus();
+  }));
   DOC_TYPES.forEach(t=>els.docClassification.add(new Option(t || "Sem classificação", t)));
 
   document.querySelectorAll(".step,.next,.prev").forEach(b=>b.onclick=()=>goStep(+(b.dataset.step||b.dataset.next||b.dataset.prev)));
@@ -1530,7 +1582,11 @@ function bind(){
   els.cleanPresetBtn.onclick=()=>{Object.assign(currentPage().adjust,{brightness:106,contrast:125,saturation:108,grayscale:0,threshold:0}); currentPage().thumbCache=null; render();};
   els.resetFilterBtn.onclick=()=>{Object.assign(currentPage().adjust,{brightness:100,contrast:100,saturation:100,grayscale:0,threshold:0}); currentPage().thumbCache=null; render();};
   els.autoCornersBtn.onclick=autoCorners;
-  document.querySelectorAll(".quality-option").forEach(btn=>btn.onclick=()=>{state.pdfQuality=btn.dataset.quality||"standard";updateQualityUi();if(document.getElementById("step3")?.classList.contains("active"))refreshStep3Preview(false);});
+  if(els.preservePdfNative)els.preservePdfNative.onchange=()=>{
+    updateQualityUi();
+    if(document.getElementById("step3")?.classList.contains("active"))refreshStep3Preview(false);
+    setStatus(els.preservePdfNative.checked?"Preservação de PDF nativo ativada.":"Preservação de PDF nativo desativada.");
+  };
   els.resetCornersBtn.onclick=()=>{const p=currentPage();if(p){p.adjust.corners=defaultAdjust().corners;render();}};
   els.rotateLeftBtn.onclick=()=>{const p=currentPage();if(p){p.adjust.rotation=normalizeRotation(p.adjust.rotation-90);p.thumbCache=null;render();}};
   els.rotateRightBtn.onclick=()=>{const p=currentPage();if(p){p.adjust.rotation=normalizeRotation(p.adjust.rotation+90);p.thumbCache=null;render();}};
@@ -1620,7 +1676,7 @@ function closeNewProjectConfirm(){
 function resetProject(){
   if(state.lastBlobUrl)URL.revokeObjectURL(state.lastBlobUrl);
   state.docs=[];state.activeDocId=null;state.activeAttachmentId=null;state.activePageId=null;state.activeExportDocId=null;state.lastBlobUrl=null;state.lastPreviewSignature=null;state.bgCache={};state.customBackgrounds={cover:null,letterhead:null};state.pendingAttachmentTarget=null;state.fontBytes={montserratRegular:null,montserratBold:null,libreRegular:null};state.pdfQuality="standard";if(state.ocrWorker){try{state.ocrWorker.terminate();}catch(_){ }state.ocrWorker=null;state.ocrWorkerLang=null;}
-  const set=(el,val,prop="value")=>{if(el)el[prop]=val;}; set(els.includeCover,false,"checked");set(els.includeLetterhead,false,"checked");set(els.globalTemplate,"none");set(els.scanType,"standard");set(els.uploadMode,"new-attachment");set(els.facesPerSheet,"2");set(els.paperScope,"page");set(els.paperSize,"a4");set(els.orientation,"portrait");set(els.pageRotation,"0");set(els.paperMargin,10);set(els.paperMarginY,10);set(els.autoRotateFit,false,"checked");set(els.brightness,100);set(els.contrast,100);set(els.saturation,100);set(els.grayscale,0);set(els.threshold,0);set(els.perspectiveEnabled,false,"checked");set(els.showCorrectedPreview,true,"checked");set(els.includeHeader,true,"checked");set(els.includePageNumbers,true,"checked");set(els.includeFooterInfo,true,"checked");set(els.embedOcrText,true,"checked");set(els.ocrLang,"por");set(els.exportMode,"single");set(els.outputName,"");const fontPreset=$("fontPresetSelect");if(fontPreset)fontPreset.value="montserrat";
+  const set=(el,val,prop="value")=>{if(el)el[prop]=val;}; set(els.includeCover,false,"checked");set(els.includeLetterhead,false,"checked");set(els.globalTemplate,"none");set(els.scanType,"standard");set(els.uploadMode,"new-attachment");set(els.facesPerSheet,"2");set(els.paperScope,"page");set(els.paperSize,"a4");set(els.orientation,"portrait");set(els.pageRotation,"0");set(els.paperMargin,10);set(els.paperMarginY,10);set(els.autoRotateFit,false,"checked");set(els.brightness,100);set(els.contrast,100);set(els.saturation,100);set(els.grayscale,0);set(els.threshold,0);set(els.perspectiveEnabled,false,"checked");set(els.showCorrectedPreview,true,"checked");set(els.includeHeader,true,"checked");set(els.includePageNumbers,true,"checked");set(els.includeFooterInfo,true,"checked");set(els.embedOcrText,true,"checked");set(els.ocrLang,"por");set(els.exportMode,"single");set(els.outputName,"");state.pdfQuality="standard";set(els.preservePdfNative,true,"checked");const fontPreset=$("fontPresetSelect");if(fontPreset)fontPreset.value="montserrat";
   [els.customCoverFile,els.customLetterheadFile,els.fontMontserratRegular,els.fontMontserratBold,els.fontLibreRegular].forEach(el=>{if(el)el.value="";});if(els.customCoverName)els.customCoverName.textContent="Nenhuma capa própria.";if(els.customLetterheadName)els.customLetterheadName.textContent="Nenhum timbrado próprio.";
   if(els.pdfFrame){els.pdfFrame.removeAttribute("src");els.pdfFrame.style.display="none";}if(els.openPreviewLink){els.openPreviewLink.hidden=true;els.openPreviewLink.removeAttribute("href");}if(els.previewEmpty)els.previewEmpty.style.display="block";if(els.downloadPreviewBtn)els.downloadPreviewBtn.disabled=true;
   addDoc();goStep(1);setStatus("Novo projeto iniciado com todas as configurações do documento restauradas.");
@@ -1657,7 +1713,7 @@ async function setupPwa(){
 
   if("serviceWorker" in navigator){
     try{
-      const registration=await navigator.serviceWorker.register("./sw.js?v=46",{scope:"./"});
+      const registration=await navigator.serviceWorker.register("./sw.js?v=47",{scope:"./"});
       await navigator.serviceWorker.ready;
       registration.update?.().catch(()=>{});
     }catch(err){
