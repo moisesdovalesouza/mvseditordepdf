@@ -314,3 +314,17 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Funções legadas de giro automático do conteúdo foram neutralizadas para impedir páginas de cabeça para baixo.
 - Card de folha mostra o resultado efetivo: formato, orientação, dimensões, margens e rotação manual.
 - A prévia final da Etapa 2 se atualiza também ao mudar timbre, modelo, cabeçalho, rodapé e numeração.
+
+
+## v46 — 21/09/2026 — estabilização
+
+- A prévia final da Etapa 2 e a exportação passam a compartilhar o mesmo cálculo de folha, área útil e células de composição.
+- A prévia mostra a folha composta inteira quando 2 a 6 páginas foram agrupadas.
+- Modos “Resultado final” e “Editar recorte” foram separados em controle segmentado.
+- A orientação automática altera somente Retrato/Paisagem e nunca gira o conteúdo.
+- “Original do anexo” preserva a geometria da folha e desativa interferências de layout.
+- Rotação manual 0°/90°/180°/270° continua explícita e independente da orientação automática.
+- A Etapa 3 força uma prévia nova a cada entrada e usa assinatura do projeto para impedir prévias obsoletas.
+- Responsividade da Etapa 2 foi reforçada para celular, tablet e desktop.
+- Os antigos fix-v40.css a fix-v45.css foram consolidados em style.css e deixaram de ser carregados separadamente.
+- Incluído diagnóstico interno para invariantes de orientação e modo Original.
