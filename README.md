@@ -328,3 +328,13 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Responsividade da Etapa 2 foi reforçada para celular, tablet e desktop.
 - Os antigos fix-v40.css a fix-v45.css foram consolidados em style.css e deixaram de ser carregados separadamente.
 - Incluído diagnóstico interno para invariantes de orientação e modo Original.
+
+
+## v47 — 21/09/2026 — correção do card Qualidade do PDF
+
+- Restaurada a função central de atualização do card de qualidade, removida acidentalmente durante a consolidação da v46.
+- Compacto, Padrão, Alta e Máxima voltam a alterar o preset usado na exportação.
+- Badge, barra de qualidade e estimativa de tamanho são atualizados imediatamente.
+- “Preservar PDF nativo” agora atualiza a estimativa e invalida a prévia da Etapa 3 quando alterado.
+- Seleção de qualidade ganhou comportamento de radiogroup e navegação por teclado.
+- Novo projeto restaura Padrão + preservação de PDF nativo ativada.
