@@ -459,7 +459,7 @@ function renderExportDocs(){
     const b = document.createElement("button");
     b.className = "doc-tab" + (doc.id===state.activeExportDocId ? " active" : "");
     b.innerHTML = `<strong>${esc([doc.number || "Doc", doc.title || doc.classification || ""].filter(Boolean).join(" - "))}</strong><small>${doc.attachments.length} anexo(s)</small>`;
-    b.onclick = () => { state.activeExportDocId = doc.id; renderExportDocs(); renderExportThumbs(); };
+    b.onclick = () => { state.activeExportDocId = doc.id; renderExportDocs(); renderExportThumbs(); b.scrollIntoView?.({block:"nearest",inline:"nearest"}); };
     els.exportDocList.appendChild(b);
   });
 }
@@ -1397,15 +1397,20 @@ function outputNameForDocs(docs){
   return "documentos.pdf";
 }
 
+let previewRunId = 0;
+
 async function previewPdf(){
+  const runId = ++previewRunId;
   if(!state.docs.some(d=>d.attachments.length)){setStatus("Nenhum anexo para gerar.");return;}
   setStatus("Gerando pré-visualização...");
   const blob=await buildPdf(state.docs);
+  if(runId !== previewRunId) return;
   if(state.lastBlobUrl)URL.revokeObjectURL(state.lastBlobUrl);
   state.lastBlobUrl=URL.createObjectURL(blob);
   els.pdfFrame.src=state.lastBlobUrl;
   els.pdfFrame.style.display="block";
   if(els.openPreviewLink){els.openPreviewLink.href=state.lastBlobUrl; els.openPreviewLink.hidden=false;}
+  els.previewEmpty.classList.remove("preview-refreshing");
   els.previewEmpty.style.display="none";
   els.downloadPreviewBtn.disabled=false;
   setStatus("Pré-visualização gerada.");
@@ -1636,22 +1641,41 @@ function resetProject(){
   if(els.pdfFrame){els.pdfFrame.removeAttribute("src");els.pdfFrame.style.display="none";}if(els.openPreviewLink){els.openPreviewLink.hidden=true;els.openPreviewLink.removeAttribute("href");}if(els.previewEmpty)els.previewEmpty.style.display="block";if(els.downloadPreviewBtn)els.downloadPreviewBtn.disabled=true;
   addDoc();goStep(1);setStatus("Novo projeto iniciado com todas as configurações do documento restauradas.");
 }
+function refreshStep3Preview(){
+  const hasAttachments=state.docs.some(d=>d.attachments.length);
+  ++previewRunId;
+  if(state.lastBlobUrl){
+    try{URL.revokeObjectURL(state.lastBlobUrl);}catch(_){}
+    state.lastBlobUrl=null;
+  }
+  if(els.pdfFrame){
+    els.pdfFrame.removeAttribute("src");
+    els.pdfFrame.style.display="none";
+  }
+  if(els.downloadPreviewBtn)els.downloadPreviewBtn.disabled=true;
+  if(els.openPreviewLink){els.openPreviewLink.hidden=true;els.openPreviewLink.removeAttribute("href");}
+  if(!hasAttachments){
+    if(els.previewEmpty){
+      els.previewEmpty.classList.remove("preview-refreshing");
+      els.previewEmpty.style.display="grid";
+      els.previewEmpty.textContent="Adicione documentos para gerar a pré-visualização.";
+    }
+    return;
+  }
+  if(els.previewEmpty){
+    els.previewEmpty.classList.add("preview-refreshing");
+    els.previewEmpty.style.display="grid";
+    els.previewEmpty.textContent="Atualizando pré-visualização…";
+  }
+  setTimeout(()=>previewPdf().catch(e=>setStatus("Erro ao pré-visualizar: "+e.message)),80);
+}
+
 function goStep(n){
   document.querySelectorAll(".step-panel").forEach(p=>p.classList.remove("active"));
   $("step"+n).classList.add("active");
   document.querySelectorAll(".step").forEach(s=>s.classList.toggle("active",+s.dataset.step===n));
   render();
-  if(n===3){
-    const hasAttachments=state.docs.some(d=>d.attachments.length);
-    if(!hasAttachments){
-      if(els.pdfFrame){els.pdfFrame.removeAttribute("src");els.pdfFrame.style.display="none";}
-      if(els.previewEmpty){els.previewEmpty.style.display="grid";els.previewEmpty.textContent="Adicione documentos para gerar a pré-visualização.";}
-      if(els.downloadPreviewBtn)els.downloadPreviewBtn.disabled=true;
-      if(els.openPreviewLink)els.openPreviewLink.hidden=true;
-    }else{
-      setTimeout(()=>previewPdf().catch(e=>setStatus("Erro ao pré-visualizar: "+e.message)),260);
-    }
-  }
+  if(n===3) refreshStep3Preview();
 }
 
 async function setupPwa(){
@@ -1664,7 +1688,7 @@ async function setupPwa(){
 
   if("serviceWorker" in navigator){
     try{
-      const registration=await navigator.serviceWorker.register("./sw.js?v=38",{scope:"./"});
+      const registration=await navigator.serviceWorker.register("./sw.js?v=43",{scope:"./"});
       await navigator.serviceWorker.ready;
       registration.update?.().catch(()=>{});
     }catch(err){
