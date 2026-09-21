@@ -306,3 +306,11 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Adicionado seletor de rotação manual no card da folha.
 - “Original do anexo” preserva tamanho e área útil e ignora margens, orientação automática, timbre, cabeçalho e rodapé.
 - PDFs nativos em Original e sem rotação manual são copiados diretamente.
+
+
+## v45 — 21/09/2026
+
+- Orientação automática escolhe apenas a orientação da folha usando a área útil real; nunca gira o conteúdo.
+- Funções legadas de giro automático do conteúdo foram neutralizadas para impedir páginas de cabeça para baixo.
+- Card de folha mostra o resultado efetivo: formato, orientação, dimensões, margens e rotação manual.
+- A prévia final da Etapa 2 se atualiza também ao mudar timbre, modelo, cabeçalho, rodapé e numeração.
