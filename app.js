@@ -1270,7 +1270,7 @@ async function addHiddenOcrText(page,item,fonts){
   const text=item.pages.map(p=>p.ocrText||"").filter(Boolean).join("\n");
   if(text)page.drawText(text.slice(0,5000),{x:8,y:4,size:1,font:fonts.montserrat,color:PDFLib.rgb(1,1,1),opacity:.01});
 }
-async async function addNativeOrRasterExportItem(pdf,item,doc,att,cfg){
+async function addNativeOrRasterExportItem(pdf,item,doc,att,cfg){
   const settings=cfg.paper||item.paper||paperSettingsFromAdjust(item.pages[0]?.adjust||defaultAdjust());
   if(canDirectCopyNativeItem(item,settings)){const p=item.pages[0],src=await getNativeSourceDocument(p,cfg.nativeCtx),copiedArr=await pdf.copyPages(src,[p.sourcePdfPageIndex]),copied=copiedArr[0];pdf.addPage(copied);await addHiddenOcrText(copied,item,cfg.fonts);return copied;}
   const layout=computeItemLayout(item,settings),paperW=layout.paperW,paperH=layout.paperH,originalMode=layout.originalMode,{rgb}=PDFLib,page=pdf.addPage([paperW,paperH]);page.drawRectangle({x:0,y:0,width:paperW,height:paperH,color:rgb(1,1,1)});
