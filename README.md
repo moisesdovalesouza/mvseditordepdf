@@ -272,3 +272,11 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Restaurado o ícone no cabeçalho do aplicativo com uma única imagem robusta.
 - Mantidos favicon e ícones PWA/instalação com os ativos já versionados no repositório.
 - Service worker atualizado para invalidar cache antigo.
+
+
+## v41 — 20/09/2026
+
+- Reorganizada a Etapa 2 em telas pequenas, com fluxo em coluna única no celular.
+- Prévia da página agora ocupa largura total no mobile, sem coluna espremida ao lado da estrutura.
+- Cartões de ajustes e ações da película de páginas foram empilhados para toque mais confortável.
+- Footer da Etapa 2 mantido em dois botões lado a lado no celular.
