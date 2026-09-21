@@ -76,7 +76,7 @@ const els = {
   pageFilmstrip:$("pageFilmstrip"), removePageBtn:$("removePageBtn"), movePageUpBtn:$("movePageUpBtn"), movePageDownBtn:$("movePageDownBtn"), composeSelectedPagesBtn:$("composeSelectedPagesBtn"), clearPageSelectionBtn:$("clearPageSelectionBtn"), clearCompositionsBtn:$("clearCompositionsBtn"), pageSelectionCount:$("pageSelectionCount"),
   selectedPageInfo:$("selectedPageInfo"), previewCanvas:$("previewCanvas"), overlay:$("overlay"), quadPolygon:$("quadPolygon"), emptyCanvas:$("emptyCanvas"), precisionLoupe:$("precisionLoupe"), precisionLoupeCanvas:$("precisionLoupeCanvas"), precisionLoupeText:$("precisionLoupeText"),
   showCorrectedPreview:$("showCorrectedPreview"), autoCornersBtn:$("autoCornersBtn"), resetCornersBtn:$("resetCornersBtn"), rotateLeftBtn:$("rotateLeftBtn"), rotateRightBtn:$("rotateRightBtn"),
-  paperScope:$("paperScope"), paperSize:$("paperSize"), orientation:$("orientation"), paperMargin:$("paperMargin"), paperMarginValue:$("paperMarginValue"), paperMarginY:$("paperMarginY"), paperMarginYValue:$("paperMarginYValue"), autoRotateFit:$("autoRotateFit"),
+  paperScope:$("paperScope"), paperSize:$("paperSize"), orientation:$("orientation"), pageRotation:$("pageRotation"), paperMargin:$("paperMargin"), paperMarginValue:$("paperMarginValue"), paperMarginY:$("paperMarginY"), paperMarginYValue:$("paperMarginYValue"), autoRotateFit:$("autoRotateFit"), paperOriginalNotice:$("paperOriginalNotice"), paperLayoutCard:$("paperLayoutCard"),
   perspectiveEnabled:$("perspectiveEnabled"), edgeTop:$("edgeTop"), edgeRight:$("edgeRight"), edgeBottom:$("edgeBottom"), edgeLeft:$("edgeLeft"),
   edgeTopValue:$("edgeTopValue"), edgeRightValue:$("edgeRightValue"), edgeBottomValue:$("edgeBottomValue"), edgeLeftValue:$("edgeLeftValue"),
   brightness:$("brightness"), contrast:$("contrast"), saturation:$("saturation"), grayscale:$("grayscale"), threshold:$("threshold"),
@@ -579,7 +579,7 @@ function syncControls(){
   const a = p?.adjust || defaultAdjust();
   els.perspectiveEnabled.checked = a.perspective;
   els.brightness.value = a.brightness; els.contrast.value = a.contrast; els.saturation.value = a.saturation; els.grayscale.value = a.grayscale; els.threshold.value = a.threshold;
-  if(els.paperSize)els.paperSize.value=a.paperSize||"a4"; if(els.orientation)els.orientation.value=a.orientation||"portrait"; if(els.paperMargin)els.paperMargin.value=Number(a.marginX??10); if(els.paperMarginY)els.paperMarginY.value=Number(a.marginY??10); if(els.autoRotateFit)els.autoRotateFit.checked=!!a.autoRotateFit;
+  if(els.paperSize)els.paperSize.value=a.paperSize||"a4"; if(els.orientation)els.orientation.value=a.orientation||"portrait"; if(els.pageRotation)els.pageRotation.value=String(normalizeRotation(a.rotation)); if(els.paperMargin)els.paperMargin.value=Number(a.marginX??10); if(els.paperMarginY)els.paperMarginY.value=Number(a.marginY??10); if(els.autoRotateFit)els.autoRotateFit.checked=!!a.autoRotateFit;
   syncEdges(a.corners);
   syncPaperOriginalUi();
   updateLabels();
@@ -597,8 +597,15 @@ function saveControls(){
 }
 
 function applyPaperControlsFromUI(){
-  const p=currentPage();if(!p)return; const settings={paperSize:els.paperSize.value,orientation:els.orientation.value,marginX:Number(els.paperMargin.value),marginY:Number(els.paperMarginY.value),autoRotateFit:els.autoRotateFit.checked};
-  const targets=els.paperScope?.value==="attachment"?(currentAttachment()?.pages||[]):[p];targets.forEach(pg=>{Object.assign(pg.adjust,settings);pg.thumbCache=null;});syncPaperOriginalUi();updateLabels();schedulePreviewRender();
+  const p=currentPage();if(!p)return;
+  const settings={paperSize:els.paperSize.value,orientation:els.orientation.value,marginX:Number(els.paperMargin.value),marginY:Number(els.paperMarginY.value),autoRotateFit:els.autoRotateFit.checked};
+  const targets=els.paperScope?.value==="attachment"?(currentAttachment()?.pages||[]):[p];
+  targets.forEach(pg=>{Object.assign(pg.adjust,settings);pg.thumbCache=null;});
+  syncPaperOriginalUi();updateLabels();schedulePreviewRender();
+}
+function applyManualRotationFromUI(){
+  const p=currentPage();if(!p||!els.pageRotation)return;
+  p.adjust.rotation=normalizeRotation(els.pageRotation.value);p.thumbCache=null;renderPageFilmstrip();schedulePreviewRender();
 }
 
 function updateLabels(){
@@ -638,21 +645,22 @@ function makePreviewCanvas(p,raw=false){
   const scaled=scaleCanvasForPreview(p.sourceCanvas,1200); const proxy={...p,sourceCanvas:scaled,adjust:{...p.adjust,corners:p.adjust.corners.map(x=>({...x}))}}; return makePageCanvas(proxy,raw);
 }
 function schedulePreviewRender(){ if(state.previewRaf) cancelAnimationFrame(state.previewRaf); state.previewRaf=requestAnimationFrame(()=>{state.previewRaf=0;renderPreview();}); }
+const finalPreviewBgCache=new Map();
+function getFinalPreviewBackground(src){if(!src)return null;let entry=finalPreviewBgCache.get(src);if(entry?.ready)return entry.img;if(entry)return null;const img=new Image();entry={img,ready:false};finalPreviewBgCache.set(src,entry);img.onload=()=>{entry.ready=true;schedulePreviewRender();};img.onerror=()=>finalPreviewBgCache.delete(src);img.src=src;return null;}
+function currentLetterheadPreviewSource(){if(state.customBackgrounds.letterhead?.dataUrl)return state.customBackgrounds.letterhead.dataUrl;const template=els.globalTemplate?.value||"none";if(template==="mvs")return BG_DATA.mvsLetterhead;if(template==="gdv")return BG_DATA.gdvLetterhead;return null;}
+function previewPageCounter(pageId){let counter=0,total=countExportSheets(state.docs);for(const d of state.docs)for(const a of d.attachments)for(const item of getAttachmentExportItems(a)){counter++;if(item.pages.some(p=>p.id===pageId))return {counter,total};}return {counter:1,total:Math.max(1,total)};}
+function makeFinalSheetPreviewCanvas(p){
+  const settings=paperSettingsFromAdjust(p.adjust),item={pages:[p],paper:settings},paper=getPaperForItem(settings,item),paperW=paper[0],paperH=paper[1],scale=Math.min(1.5,1050/Math.max(paperW,paperH));
+  const c=document.createElement("canvas");c.width=Math.max(1,Math.round(paperW*scale));c.height=Math.max(1,Math.round(paperH*scale));const ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);const original=settings.paperSize==="original";
+  if(!original&&els.includeLetterhead?.checked){const bg=getFinalPreviewBackground(currentLetterheadPreviewSource());if(bg)ctx.drawImage(bg,0,0,c.width,c.height);}
+  const marginX=original?0:mmToPt(settings.marginX),marginY=original?0:mmToPt(settings.marginY),header=original?0:(els.includeHeader?.checked?36:10),footer=original?0:((els.includePageNumbers?.checked||els.includeFooterInfo?.checked)?34:10),box={x:marginX,y:marginY+footer,w:Math.max(20,paperW-2*marginX),h:Math.max(20,paperH-2*marginY-header-footer)};
+  const content=makePreviewCanvas(p,false),ratio=Math.min(box.w/content.width,box.h/content.height),contentW=content.width*ratio,contentH=content.height*ratio,dx=(box.x+(box.w-contentW)/2)*scale,dy=(paperH-(box.y+(box.h-contentH)/2)-contentH)*scale;ctx.drawImage(content,dx,dy,contentW*scale,contentH*scale);
+  if(!original){ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--foreground").trim()||"#1d2433";const doc=currentDoc(),att=currentAttachment();if(els.includeHeader?.checked){const titleOrClass=doc?.title||doc?.classification||"",attLabel=att?.title||att?.classification||"",txt=(doc?.number||"")+(titleOrClass?" - "+titleOrClass:"")+(attLabel?" | "+attLabel:"");ctx.font=Math.max(9,8*scale)+"px Inter, Arial, sans-serif";ctx.fillText(txt.slice(0,110),mmToPt(12)*scale,mmToPt(24)*scale,Math.max(20,(paperW-mmToPt(24))*scale));}if(els.includeFooterInfo?.checked){const parts=[];if(doc?.classification)parts.push("Classificação: "+doc.classification);if(att?.classification)parts.push("Anexo: "+att.classification);if(parts.length){ctx.font=Math.max(8,7*scale)+"px Inter, Arial, sans-serif";ctx.fillText(parts.join(" · ").slice(0,130),mmToPt(12)*scale,(paperH-mmToPt(8))*scale,Math.max(20,(paperW-mmToPt(24))*scale));}}if(els.includePageNumbers?.checked){const n=previewPageCounter(p.id),txt=n.counter+" de "+n.total;ctx.font=Math.max(9,9*scale)+"px Inter, Arial, sans-serif";const m=ctx.measureText(txt);ctx.fillText(txt,(c.width-m.width)/2,(paperH-mmToPt(18))*scale);}}
+  return {canvas:c,settings};
+}
 function renderPreview(){
-  const p = currentPage();
-  if (!p) {
-    els.previewCanvas.style.display="none"; els.overlay.hidden=true; els.emptyCanvas.style.display="block"; els.selectedPageInfo.textContent="Nenhuma página selecionada.";
-    return;
-  }
-  saveControls();
-  const canvas = makePreviewCanvas(p, !els.showCorrectedPreview.checked);
-  els.previewCanvas.width = canvas.width; els.previewCanvas.height = canvas.height;
-  const ctx = els.previewCanvas.getContext("2d");
-  ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(canvas,0,0);
-  els.previewCanvas.style.display="block"; els.emptyCanvas.style.display="none";
-  els.overlay.hidden = els.showCorrectedPreview.checked;
-  els.selectedPageInfo.textContent = `${currentDoc()?.number || "Doc"} | ${currentAttachment()?.title || currentAttachment()?.classification || "Anexo sem título"}`;
-  requestAnimationFrame(updateOverlay);
+  const p=currentPage();if(!p){els.previewCanvas.style.display="none";els.overlay.hidden=true;els.emptyCanvas.style.display="block";els.selectedPageInfo.textContent="Nenhuma página selecionada.";return;}
+  saveControls();const finalMode=!!els.showCorrectedPreview?.checked,result=finalMode?makeFinalSheetPreviewCanvas(p):{canvas:makePreviewCanvas(p,true),settings:paperSettingsFromAdjust(p.adjust)},canvas=result.canvas;els.previewCanvas.width=canvas.width;els.previewCanvas.height=canvas.height;const ctx=els.previewCanvas.getContext("2d");ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(canvas,0,0);els.previewCanvas.style.display="block";els.emptyCanvas.style.display="none";els.overlay.hidden=finalMode;const settings=result.settings||paperSettingsFromAdjust(p.adjust),modeText=finalMode?(settings.paperSize==="original"?"Original preservado":"Prévia final da folha"):"Ajuste de recorte/perspectiva";els.selectedPageInfo.textContent=(currentDoc()?.number||"Doc")+" | "+(currentAttachment()?.title||currentAttachment()?.classification||"Anexo sem título")+" · "+modeText;if(!finalMode)requestAnimationFrame(updateOverlay);
 }
 
 function drawThumb(page, canvas, w=90, h=120){
@@ -1048,14 +1056,30 @@ function movePage(delta){
 }
 
 function paperSettingsFromAdjust(a=defaultAdjust()){
-  return {paperSize:a.paperSize||"a4",orientation:a.orientation||"portrait",marginX:Number(a.marginX??10),marginY:Number(a.marginY??10),autoRotateFit:!!a.autoRotateFit,originalPaper:a.originalPaper?{...a.originalPaper}:null};
+  const paperSize=a.paperSize||"a4",original=paperSize==="original";
+  return {paperSize,orientation:a.orientation||"portrait",marginX:original?0:Number(a.marginX??10),marginY:original?0:Number(a.marginY??10),autoRotateFit:original?false:!!a.autoRotateFit,originalPaper:a.originalPaper?{...a.originalPaper}:null};
 }
 function getPaperFromSettings(settings){
   if(settings.paperSize==="original"&&settings.originalPaper?.width&&settings.originalPaper?.height)return [Math.max(36,settings.originalPaper.width),Math.max(36,settings.originalPaper.height)];
   let [w,h]=PAPER[settings.paperSize]||PAPER.a4;if(settings.orientation==="landscape")[w,h]=[h,w];return [w,h];
 }
-function getPaper(){return getPaperFromSettings(paperSettingsFromAdjust(currentPage()?.adjust||defaultAdjust()));}
-function syncPaperOriginalUi(){if(!els.paperSize||!els.orientation)return;const original=els.paperSize.value==="original";els.orientation.disabled=original;if(els.autoRotateFit)els.autoRotateFit.disabled=original;}
+function normalizeRotation(v){return ((Number(v)||0)%360+360)%360;}
+function getPaperForItem(settings,item){
+  let paper=getPaperFromSettings(settings),w=paper[0],h=paper[1],pages=item?.pages||[];
+  if(settings.paperSize==="original"){const rot=pages.length===1?normalizeRotation(pages[0]?.adjust?.rotation):0;if(rot===90||rot===270){const t=w;w=h;h=t;}return [w,h];}
+  if(!settings.autoRotateFit||pages.length!==1)return [w,h];
+  const p=pages[0],src=p?.sourceCanvas;if(!src)return [w,h];
+  const visual=rotatedVisualSize(src.width,src.height,p.adjust?.rotation||0),current=Math.min(w/visual.width,h/visual.height),alternative=Math.min(h/visual.width,w/visual.height);
+  return alternative>current*1.04?[h,w]:[w,h];
+}
+function getPaper(){const p=currentPage(),settings=paperSettingsFromAdjust(p?.adjust||defaultAdjust());return getPaperForItem(settings,{pages:p?[p]:[]});}
+function syncPaperOriginalUi(){
+  if(!els.paperSize||!els.orientation)return;
+  const original=els.paperSize.value==="original";
+  [els.orientation,els.paperMargin,els.paperMarginY,els.autoRotateFit].forEach(el=>{if(el)el.disabled=original;});
+  if(els.paperOriginalNotice)els.paperOriginalNotice.hidden=!original;
+  if(els.paperLayoutCard)els.paperLayoutCard.classList.toggle("original-paper-active",original);
+}
 
 async function canvasBlob(canvas,type="image/png",quality){
   return new Promise((resolve,reject)=>{
@@ -1254,18 +1278,7 @@ function compositionGrid(pages,box){
   return cells;
 }
 function canDirectCopyNativeItem(item,settings){
-  if(item.pages.length!==1)return false;
-  const p=item.pages[0],a=p.adjust||defaultAdjust();
-  return canPreservePdfPage(p) &&
-    settings.paperSize==="original" &&
-    Number(settings.marginX||0)===0 &&
-    Number(settings.marginY||0)===0 &&
-    !settings.autoRotateFit &&
-    (((Number(a.rotation)||0)%360+360)%360)===0 &&
-    !els.includeLetterhead.checked &&
-    !els.includeHeader.checked &&
-    !els.includePageNumbers.checked &&
-    !els.includeFooterInfo.checked;
+  if(item.pages.length!==1)return false;const p=item.pages[0],a=p.adjust||defaultAdjust();return canPreservePdfPage(p)&&settings.paperSize==="original"&&normalizeRotation(a.rotation)===0;
 }
 async function addHiddenOcrText(page,item,fonts){
   if(!els.embedOcrText.checked)return;
@@ -1283,17 +1296,17 @@ async function addNativeOrRasterExportItem(pdf,item,doc,att,cfg){
     return copied;
   }
 
-  const {rgb}=PDFLib,[paperW,paperH]=getPaperFromSettings(settings);
+  const {rgb}=PDFLib,paper=getPaperForItem(settings,item),paperW=paper[0],paperH=paper[1],originalMode=settings.paperSize==="original";
   const page=pdf.addPage([paperW,paperH]);
   page.drawRectangle({x:0,y:0,width:paperW,height:paperH,color:rgb(1,1,1)});
   const template=els.globalTemplate.value;
-  if(els.includeLetterhead.checked){
+  if(!originalMode&&els.includeLetterhead.checked){
     const bg=await loadBg(pdf,template,"letterhead");
     if(bg)page.drawImage(bg,{x:0,y:0,width:paperW,height:paperH});
   }
 
-  const marginX=mmToPt(settings.marginX),marginY=mmToPt(settings.marginY);
-  const header=els.includeHeader.checked?36:10,footer=(els.includePageNumbers.checked||els.includeFooterInfo.checked)?34:10;
+  const marginX=originalMode?0:mmToPt(settings.marginX),marginY=originalMode?0:mmToPt(settings.marginY);
+  const header=originalMode?0:(els.includeHeader.checked?36:10),footer=originalMode?0:((els.includePageNumbers.checked||els.includeFooterInfo.checked)?34:10);
   const box={x:marginX,y:marginY+footer,w:Math.max(20,paperW-2*marginX),h:Math.max(20,paperH-2*marginY-header-footer)};
   const cells=item.pages.length>1?compositionGrid(item.pages,box):[box];
 
@@ -1301,16 +1314,15 @@ async function addNativeOrRasterExportItem(pdf,item,doc,att,cfg){
     const p=item.pages[i],cell=cells[i]||box;
     if(canPreservePdfPage(p)){
       const embedded=await getNativeEmbeddedPage(pdf,p,cfg.nativeCtx);
-      drawEmbeddedPdfContained(page,embedded,cell,p.adjust?.rotation||0,!!settings.autoRotateFit);
+      drawEmbeddedPdfContained(page,embedded,cell,p.adjust?.rotation||0,false);
     }else{
-      let c=makePageCanvas(p,false);
-      if(settings.autoRotateFit)c=orientCanvasForBox(c,cell.w,cell.h);
+      const c=makePageCanvas(p,false);
       const img=await embedCanvasForQuality(pdf,c);
       drawEmbeddedImageContained(page,img,cell);
     }
   }
 
-  drawHeaderFooter(page,doc,att,{paperW,paperH,fonts:cfg.fonts,counter:cfg.counter,total:cfg.total});
+  if(!originalMode)drawHeaderFooter(page,doc,att,{paperW,paperH,fonts:cfg.fonts,counter:cfg.counter,total:cfg.total});
   await addHiddenOcrText(page,item,cfg.fonts);
   return page;
 }
@@ -1541,6 +1553,7 @@ function bind(){
   [els.brightness,els.contrast,els.saturation,els.grayscale,els.threshold].forEach(el=>el&& (el.onchange=()=>renderPageFilmstrip()));
   [els.edgeTop,els.edgeRight,els.edgeBottom,els.edgeLeft].forEach(el=>el&& (el.oninput=()=>{setCornersFromEdges();}));
   [els.paperSize,els.orientation,els.paperMargin,els.paperMarginY,els.autoRotateFit].forEach(el=>{if(!el)return;el.oninput=applyPaperControlsFromUI;el.onchange=applyPaperControlsFromUI;});
+  if(els.pageRotation)els.pageRotation.onchange=applyManualRotationFromUI;
   if(els.showCorrectedPreview)els.showCorrectedPreview.onchange=schedulePreviewRender;
   els.scannerPresetBtn.onclick=()=>{Object.assign(currentPage().adjust,{brightness:112,contrast:150,saturation:0,grayscale:100,threshold:0}); currentPage().thumbCache=null; render();};
   els.cleanPresetBtn.onclick=()=>{Object.assign(currentPage().adjust,{brightness:106,contrast:125,saturation:108,grayscale:0,threshold:0}); currentPage().thumbCache=null; render();};
@@ -1548,8 +1561,8 @@ function bind(){
   els.autoCornersBtn.onclick=autoCorners;
   document.querySelectorAll(".quality-option").forEach(btn=>btn.onclick=()=>{state.pdfQuality=btn.dataset.quality||"standard";updateQualityUi();if(document.getElementById("step3")?.classList.contains("active"))previewPdf().catch(()=>{});});
   els.resetCornersBtn.onclick=()=>{const p=currentPage();if(p){p.adjust.corners=defaultAdjust().corners;render();}};
-  els.rotateLeftBtn.onclick=()=>{const p=currentPage();if(p){p.adjust.rotation=(p.adjust.rotation-90)%360;p.thumbCache=null;render();}};
-  els.rotateRightBtn.onclick=()=>{const p=currentPage();if(p){p.adjust.rotation=(p.adjust.rotation+90)%360;p.thumbCache=null;render();}};
+  els.rotateLeftBtn.onclick=()=>{const p=currentPage();if(p){p.adjust.rotation=normalizeRotation(p.adjust.rotation-90);p.thumbCache=null;render();}};
+  els.rotateRightBtn.onclick=()=>{const p=currentPage();if(p){p.adjust.rotation=normalizeRotation(p.adjust.rotation+90);p.thumbCache=null;render();}};
   els.applyToAttachmentBtn.onclick=()=>applyAdjust("attachment");
   els.applyToDocBtn.onclick=()=>applyAdjust("doc");
   els.applyToAllBtn.onclick=()=>applyAdjust("all");
@@ -1636,7 +1649,7 @@ function closeNewProjectConfirm(){
 function resetProject(){
   if(state.lastBlobUrl)URL.revokeObjectURL(state.lastBlobUrl);
   state.docs=[];state.activeDocId=null;state.activeAttachmentId=null;state.activePageId=null;state.activeExportDocId=null;state.lastBlobUrl=null;state.bgCache={};state.customBackgrounds={cover:null,letterhead:null};state.pendingAttachmentTarget=null;state.fontBytes={montserratRegular:null,montserratBold:null,libreRegular:null};state.pdfQuality="standard";if(state.ocrWorker){try{state.ocrWorker.terminate();}catch(_){ }state.ocrWorker=null;state.ocrWorkerLang=null;}
-  const set=(el,val,prop="value")=>{if(el)el[prop]=val;}; set(els.includeCover,false,"checked");set(els.includeLetterhead,false,"checked");set(els.globalTemplate,"none");set(els.scanType,"standard");set(els.uploadMode,"new-attachment");set(els.facesPerSheet,"2");set(els.paperScope,"page");set(els.paperSize,"a4");set(els.orientation,"portrait");set(els.paperMargin,10);set(els.paperMarginY,10);set(els.autoRotateFit,false,"checked");set(els.brightness,100);set(els.contrast,100);set(els.saturation,100);set(els.grayscale,0);set(els.threshold,0);set(els.perspectiveEnabled,false,"checked");set(els.showCorrectedPreview,false,"checked");set(els.includeHeader,true,"checked");set(els.includePageNumbers,true,"checked");set(els.includeFooterInfo,true,"checked");set(els.embedOcrText,true,"checked");set(els.ocrLang,"por");set(els.exportMode,"single");set(els.outputName,"");const fontPreset=$("fontPresetSelect");if(fontPreset)fontPreset.value="montserrat";
+  const set=(el,val,prop="value")=>{if(el)el[prop]=val;}; set(els.includeCover,false,"checked");set(els.includeLetterhead,false,"checked");set(els.globalTemplate,"none");set(els.scanType,"standard");set(els.uploadMode,"new-attachment");set(els.facesPerSheet,"2");set(els.paperScope,"page");set(els.paperSize,"a4");set(els.orientation,"portrait");set(els.paperMargin,10);set(els.paperMarginY,10);set(els.autoRotateFit,false,"checked");set(els.brightness,100);set(els.contrast,100);set(els.saturation,100);set(els.grayscale,0);set(els.threshold,0);set(els.perspectiveEnabled,false,"checked");set(els.showCorrectedPreview,true,"checked");set(els.includeHeader,true,"checked");set(els.includePageNumbers,true,"checked");set(els.includeFooterInfo,true,"checked");set(els.embedOcrText,true,"checked");set(els.ocrLang,"por");set(els.exportMode,"single");set(els.outputName,"");const fontPreset=$("fontPresetSelect");if(fontPreset)fontPreset.value="montserrat";
   [els.customCoverFile,els.customLetterheadFile,els.fontMontserratRegular,els.fontMontserratBold,els.fontLibreRegular].forEach(el=>{if(el)el.value="";});if(els.customCoverName)els.customCoverName.textContent="Nenhuma capa própria.";if(els.customLetterheadName)els.customLetterheadName.textContent="Nenhum timbrado próprio.";
   if(els.pdfFrame){els.pdfFrame.removeAttribute("src");els.pdfFrame.style.display="none";}if(els.openPreviewLink){els.openPreviewLink.hidden=true;els.openPreviewLink.removeAttribute("href");}if(els.previewEmpty)els.previewEmpty.style.display="block";if(els.downloadPreviewBtn)els.downloadPreviewBtn.disabled=true;
   addDoc();goStep(1);setStatus("Novo projeto iniciado com todas as configurações do documento restauradas.");
@@ -1688,7 +1701,7 @@ async function setupPwa(){
 
   if("serviceWorker" in navigator){
     try{
-      const registration=await navigator.serviceWorker.register("./sw.js?v=43",{scope:"./"});
+      const registration=await navigator.serviceWorker.register("./sw.js?v=44",{scope:"./"});
       await navigator.serviceWorker.ready;
       registration.update?.().catch(()=>{});
     }catch(err){
