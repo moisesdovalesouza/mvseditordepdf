@@ -3,7 +3,7 @@
   "name": "MVS Editor de PDF",
   "short_name": "MVS PDF",
   "description": "Editor jurídico de PDF para organizar, ajustar, preservar e exportar documentos.",
-  "start_url": "/?pwa=v41",
+  "start_url": "/?pwa=v42",
   "scope": "/",
   "display": "standalone",
   "display_override": [
