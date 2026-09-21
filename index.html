@@ -7,7 +7,7 @@
   <meta name="description" content="Editor de PDF jurídico por etapas, com digitalização, capa, timbre, OCR e exportação." />
   <meta name="theme-color" content="#f8f6ef" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#101828" media="(prefers-color-scheme: dark)" />
-  <link rel="manifest" href="./manifest.webmanifest?v=43" />
+  <link rel="manifest" href="./manifest.webmanifest?v=44" />
   <link id="faviconIco" rel="icon" href="./icons/favicon.ico?v=40" sizes="any" />
   <link id="faviconPng" rel="icon" type="image/png" sizes="64x64" href="./icons/favicon-v37-64.png?v=40" />
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/mvs-apple-touch-v37-180.png?v=40" />
@@ -76,6 +76,7 @@
   <link rel="stylesheet" href="./fix-v41.css?v=41" />
   <link rel="stylesheet" href="./fix-v42.css?v=42" />
   <link rel="stylesheet" href="./fix-v43.css?v=43" />
+  <link rel="stylesheet" href="./fix-v44.css?v=44" />
 </head>
 <body>
   <div class="app-ambient" aria-hidden="true"></div>
@@ -97,7 +98,7 @@
           <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">Claro</button>
           <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="false">Escuro</button>
         </div>
-        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 43</button>
+        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 44</button>
         <button id="installBtn" class="ghost install-cta" hidden>Instalar app</button>
       </div>
       </div>
@@ -358,58 +359,35 @@
               <div id="pageFilmstrip" class="page-filmstrip"></div>
             </div>
 
-            <label class="checkline inline-option">
-              <input id="showCorrectedPreview" type="checkbox" />
-              Visualizar resultado corrigido
+            <label class="checkline inline-option preview-final-toggle">
+              <input id="showCorrectedPreview" type="checkbox" checked />
+              <span><strong>Prévia final da folha</strong><small>Mostra aqui o mesmo enquadramento, orientação, margens e rotação usados na exportação.</small></span>
             </label>
           </section>
 
           <aside class="controls-panel">
-            <details class="card collapsible-card">
+            <details id="paperLayoutCard" class="card collapsible-card">
               <summary>
                 <span class="card-icon icon-paper">A4</span>
-                <span>
-                  <strong>Papel e área útil</strong>
-                                  </span>
+                <span><strong>Folha, orientação e encaixe</strong></span>
               </summary>
-              <div class="details-body">
-                <label>Aplicar configuração de papel em
-                  <select id="paperScope">
-                    <option value="page" selected>Somente esta página</option>
-                    <option value="attachment">Todas as páginas deste anexo</option>
-                  </select>
+              <div class="details-body paper-layout-body">
+                <label>Aplicar configuração em
+                  <select id="paperScope"><option value="page" selected>Somente esta página</option><option value="attachment">Todas as páginas deste anexo</option></select>
                 </label>
-                <div class="two-col">
-                  <label>
-                    <span class="field-label-row">
-                      <span>Papel</span>
-                      <button class="info-tip" type="button" data-tip="Original do anexo preserva o tamanho real quando a origem é PDF. Em imagens, preserva a proporção original da fotografia sem forçar A4." aria-label="Ajuda sobre tamanho original">i</button>
-                    </span>
-                    <select id="paperSize">
-                      <option value="a4" selected>A4</option>
-                      <option value="original">Original do anexo</option>
-                      <option value="letter">Carta</option>
-                      <option value="legal">Ofício/Legal</option>
-                    </select>
+                <div class="paper-settings-grid">
+                  <label><span class="field-label-row"><span>Tamanho da folha</span><button class="info-tip" type="button" data-tip="Original do anexo mantém a folha original. Nesse modo o aplicativo não cria margens, não muda a orientação automaticamente e não reduz a área útil." aria-label="Ajuda sobre tamanho original">i</button></span>
+                    <select id="paperSize"><option value="a4" selected>A4</option><option value="original">Original do anexo — preservar integralmente</option><option value="letter">Carta</option><option value="legal">Ofício/Legal</option></select>
                   </label>
-                  <label>Orientação da folha
-                    <select id="orientation">
-                      <option value="portrait" selected>Retrato</option>
-                      <option value="landscape">Paisagem</option>
-                    </select>
-                  </label>
+                  <label>Orientação da folha<select id="orientation"><option value="portrait" selected>Retrato</option><option value="landscape">Paisagem</option></select></label>
+                  <label>Rotação manual do conteúdo<select id="pageRotation"><option value="0" selected>0° — manter</option><option value="90">90° à direita</option><option value="180">180°</option><option value="270">90° à esquerda</option></select></label>
                 </div>
-                <label>Margens laterais: <span id="paperMarginValue">10</span> mm
-                  <input id="paperMargin" type="range" min="0" max="45" value="10" />
-                </label>
-                <label>Margens superior e inferior: <span id="paperMarginYValue">10</span> mm
-                  <input id="paperMarginY" type="range" min="0" max="80" value="10" />
-                </label>
-                <label class="checkline help-checkline">
-                  <input id="autoRotateFit" type="checkbox" />
-                  <span>Permitir giro automático</span>
-                  <button class="info-tip" type="button" data-tip="Desativado: uma página em paisagem pode permanecer dentro de uma folha retrato, centralizada e sem distorção. Ativado: o app pode girar para aproveitar melhor a área útil." aria-label="Ajuda sobre giro automático">i</button>
-                </label>
+                <div id="paperOriginalNotice" class="paper-original-note" hidden><strong>Modo Original</strong><span>A folha e a área útil permanecem como no anexo. Margens, timbre, cabeçalho, rodapé e orientação automática não alteram esta página. Apenas uma rotação manual escolhida por você será aplicada.</span></div>
+                <div class="paper-margins-grid">
+                  <label>Margens laterais <span><b id="paperMarginValue">10</b> mm</span><input id="paperMargin" type="range" min="0" max="45" value="10" /></label>
+                  <label>Margens superior e inferior <span><b id="paperMarginYValue">10</b> mm</span><input id="paperMarginY" type="range" min="0" max="80" value="10" /></label>
+                </div>
+                <label class="checkline help-checkline paper-auto-orientation"><input id="autoRotateFit" type="checkbox" /><span><strong>Escolher orientação da folha automaticamente</strong><small>O aplicativo pode alternar Retrato/Paisagem para aproveitar melhor o espaço, mas nunca gira o conteúdo sozinho.</small></span><button class="info-tip" type="button" data-tip="Esta opção só troca a orientação da folha quando isso melhora o encaixe. O documento não recebe rotação automática. Use Rotação manual do conteúdo para girá-lo." aria-label="Ajuda sobre orientação automática">i</button></label>
               </div>
             </details>
 
@@ -692,7 +670,7 @@
         </div>
 
         <section class="release-card">
-          <div class="release-title"><strong>Novidades da v43</strong><span>21/09/2026</span></div>
+          <div class="release-title"><strong>Novidades da v44</strong><span>21/09/2026</span></div>
           <ul class="release-list">
             <li>Modo claro e escuro revisados com contraste consistente em todos os controles.</li>
             <li>Campos, placeholders, botões desabilitados, menus e estados ativos passam a ter cores próprias por tema.</li>
