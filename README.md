@@ -297,3 +297,12 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Seleção de Docs na Etapa 3 passou a respeitar a largura disponível e quebrar títulos longos sem estourar a grade.
 - Pré-visualização final é invalidada e gerada novamente sempre que o usuário entra na Etapa 3.
 - Geração da prévia recebeu controle contra respostas antigas quando duas gerações se sobrepõem.
+
+
+## v44 — 21/09/2026
+
+- A prévia central da Etapa 2 mostra a folha final com tamanho, orientação, margens, encaixe e rotação manual.
+- A orientação automática passa a trocar apenas Retrato/Paisagem; nunca gira o conteúdo.
+- Adicionado seletor de rotação manual no card da folha.
+- “Original do anexo” preserva tamanho e área útil e ignora margens, orientação automática, timbre, cabeçalho e rodapé.
+- PDFs nativos em Original e sem rotação manual são copiados diretamente.
