@@ -1,0 +1,5 @@
+/* v45 — refinamento do card de folha */
+#paperLayoutCard .paper-effective-info{padding:9px 11px;border:1px solid var(--border-soft);border-radius:8px;background:color-mix(in srgb,var(--primary) 7%,var(--surface-soft));color:var(--foreground);font-size:.78rem;font-weight:750;line-height:1.4}
+#paperLayoutCard.original-paper-active .paper-effective-info{border-color:color-mix(in srgb,var(--primary) 25%,var(--border-soft));background:color-mix(in srgb,var(--accent) 28%,var(--surface-soft))}
+#paperLayoutCard .paper-settings-grid select,#paperLayoutCard .paper-settings-grid input{min-width:0;max-width:100%}
+@media(max-width:820px){#paperLayoutCard .paper-settings-grid{grid-template-columns:1fr!important}#paperLayoutCard .paper-settings-grid>label:nth-child(3){grid-column:auto!important}}
