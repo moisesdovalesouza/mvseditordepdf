@@ -288,3 +288,12 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Campos internos agora obedecem ao grid do card: número e título na primeira linha, classificação em linha própria.
 - Selects, inputs, configuração de capa e bloco de anexos receberam limites de largura e overflow consistentes.
 - Em telas estreitas, os campos passam automaticamente para coluna única.
+
+
+## v43 — 21/09/2026
+
+- Miniaturas de capa e timbrado da Etapa 2 reorganizadas para não ficarem comprimidas na coluna lateral.
+- Capa e timbrado agora usam cards compactos em linha, com prévia proporcional e ações ao lado.
+- Seleção de Docs na Etapa 3 passou a respeitar a largura disponível e quebrar títulos longos sem estourar a grade.
+- Pré-visualização final é invalidada e gerada novamente sempre que o usuário entra na Etapa 3.
+- Geração da prévia recebeu controle contra respostas antigas quando duas gerações se sobrepõem.
