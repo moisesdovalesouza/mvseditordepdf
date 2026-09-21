@@ -280,3 +280,11 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Prévia da página agora ocupa largura total no mobile, sem coluna espremida ao lado da estrutura.
 - Cartões de ajustes e ações da película de páginas foram empilhados para toque mais confortável.
 - Footer da Etapa 2 mantido em dois botões lado a lado no celular.
+
+
+## v42 — 21/09/2026
+
+- Corrigido o card "Docs do projeto" da Etapa 1, que extrapolava a própria coluna.
+- Campos internos agora obedecem ao grid do card: número e título na primeira linha, classificação em linha própria.
+- Selects, inputs, configuração de capa e bloco de anexos receberam limites de largura e overflow consistentes.
+- Em telas estreitas, os campos passam automaticamente para coluna única.
