@@ -7,7 +7,14 @@
   <meta name="description" content="Editor de PDF jurídico por etapas, com digitalização, capa, timbre, OCR e exportação." />
   <meta name="theme-color" content="#f8f6ef" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#101828" media="(prefers-color-scheme: dark)" />
-  <link rel="manifest" href="./manifest.webmanifest?v=37" />
+  <link rel="manifest" href="./manifest.webmanifest?v=40" />
+  <link id="faviconIco" rel="icon" href="./icons/favicon.ico?v=40" sizes="any" />
+  <link id="faviconPng" rel="icon" type="image/png" sizes="64x64" href="./icons/favicon-v37-64.png?v=40" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/mvs-apple-touch-v37-180.png?v=40" />
+  <meta name="application-name" content="MVS Editor de PDF" />
+  <meta name="msapplication-TileColor" content="#06294b" />
+  <meta name="msapplication-TileImage" content="/icons/mvs-windows-tile-v37-150.png" />
+  <meta name="msapplication-config" content="/browserconfig.xml" />
 <link rel="icon" type="image/png" sizes="64x64" href="./icons/favicon-v37-64.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/mvs-app-v37-192.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/mvs-apple-touch-v37-180.png" />
@@ -65,6 +72,7 @@
   </script>
   <link rel="stylesheet" href="./style.css" />
   <link rel="stylesheet" href="./theme-v38.css?v=38" />
+  <link rel="stylesheet" href="./fix-v40.css?v=40" />
 </head>
 <body>
   <div class="app-ambient" aria-hidden="true"></div>
@@ -73,8 +81,7 @@
       <div class="app-header-inner">
       <div class="brand">
         <span class="brand-logo-wrap" aria-hidden="true">
-          <img src="./icons/brand-ui-light-v37.png" alt="" class="brand-logo brand-logo-light" />
-          <img src="./icons/brand-ui-dark-v37.png" alt="" class="brand-logo brand-logo-dark" />
+          <img src="./icons/mvs-app-v37-192.png?v=40" alt="" class="brand-logo brand-logo-single" />
         </span>
         <div>
           <p class="eyebrow">Processamento local</p>
@@ -87,7 +94,7 @@
           <button type="button" class="theme-option" data-theme-choice="light" aria-pressed="false">Claro</button>
           <button type="button" class="theme-option" data-theme-choice="dark" aria-pressed="false">Escuro</button>
         </div>
-        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 38</button>
+        <button id="aboutBtn" class="ghost about-cta" type="button" title="Versão, criador e histórico">Versão 40</button>
         <button id="installBtn" class="ghost install-cta" hidden>Instalar app</button>
       </div>
       </div>
@@ -103,9 +110,7 @@
       <section id="step1" class="step-panel active">
         <div class="step-section-heading">
 <div>
-            <h2>Arquivos e Docs</h2>
-                      </div>
-        </div>
+            <h2>Arquivos e Docs</h2></div></div>
 
         <div class="grid step1-split-grid">
           <section class="card upload-card">
@@ -672,7 +677,7 @@
             <p class="eyebrow">Versão e informações</p>
             <div class="about-title-line">
               <h2 id="aboutTitle">MVS Editor de PDF</h2>
-              <span class="about-version">v38</span>
+              <span class="about-version">v40</span>
             </div>
           </div>
         </div>
@@ -684,7 +689,7 @@
         </div>
 
         <section class="release-card">
-          <div class="release-title"><strong>Novidades da v38</strong><span>20/09/2026</span></div>
+          <div class="release-title"><strong>Novidades da v40</strong><span>20/09/2026</span></div>
           <ul class="release-list">
             <li>Modo claro e escuro revisados com contraste consistente em todos os controles.</li>
             <li>Campos, placeholders, botões desabilitados, menus e estados ativos passam a ter cores próprias por tema.</li>

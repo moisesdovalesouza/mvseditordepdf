@@ -264,3 +264,11 @@ PWA estático para organização, edição e exportação de PDFs jurídicos.
 - Campos, placeholders, selects, opções, botões desabilitados e focos receberam estados específicos por tema.
 - Botões de perigo, cards selecionados, qualidade, tooltips, modais, status, upload e prévias foram harmonizados.
 - Tema `Sistema` passa a compartilhar exatamente a paleta final de Claro/Escuro.
+
+
+## v40 — 20/09/2026
+
+- Corrigido o alinhamento visual da Etapa 1 em relação às demais etapas.
+- Restaurado o ícone no cabeçalho do aplicativo com uma única imagem robusta.
+- Mantidos favicon e ícones PWA/instalação com os ativos já versionados no repositório.
+- Service worker atualizado para invalidar cache antigo.
