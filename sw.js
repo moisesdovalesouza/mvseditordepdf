@@ -1,6 +1,6 @@
-const CACHE = "mvs-editor-de-pdf-v43-preview-layout";
+const CACHE = "mvs-editor-de-pdf-v44-wysiwyg-paper";
 const ASSETS = [
-  "./","./?pwa=v43","./index.html","./style.css","./theme-v38.css","./fix-v40.css","./fix-v41.css","./fix-v42.css","./fix-v43.css","./app.js","./manifest.webmanifest","./browserconfig.xml",
+  "./","./?pwa=v44","./index.html","./style.css","./theme-v38.css","./fix-v40.css","./fix-v41.css","./fix-v42.css","./fix-v43.css","./fix-v44.css","./app.js","./manifest.webmanifest","./browserconfig.xml",
   "./icons/brand-ui-light-v37.png","./icons/brand-ui-dark-v37.png",
   "./icons/favicon-v37-64.png",
   "./icons/mvs-app-v37-192.png","./icons/mvs-app-v37-512.png","./icons/mvs-app-v37-maskable-512.png",
